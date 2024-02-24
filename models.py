@@ -40,5 +40,5 @@ class BucketList(Base):
     is_done = Column(Boolean, default=False, nullable=False)
     calender = Column(Date, nullable=True)
     # 외래키
-    user_id = Column(Integer, ForeignKey("user.id"), nullable=False)
-    user = relationship("User", backref="bucketlist_users")
+    # user_id = Column(Integer, ForeignKey("user.id"), nullable=False)
+    # user = relationship("User", backref="bucketlist_users")
