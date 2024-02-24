@@ -20,7 +20,7 @@ class User(Base):
     password = Column(String, nullable=False)
     username = Column(String, unique=True, nullable=False)
     email = Column(String, unique=True, nullable=False)
-    create_at = Column(DateTime, nullable=False)
+    created_at = Column(DateTime, nullable=False)
     updated_at = Column(DateTime, nullable=False)
     is_admin = Column(Boolean, default=False, nullable=False)
     is_active = Column(Boolean, default=True, nullable=False)  # 추후 변경
@@ -32,7 +32,9 @@ class BucketList(Base):
 
     id = Column(Integer, primary_key=True)
     title = Column(String, unique=True, nullable=False)
-    create_at = Column(DateTime, nullable=False)
+    content = Column(Text, nullable=True)
+    image = Column(Text, nullable=True)
+    created_at = Column(DateTime, nullable=False)
     updated_at = Column(DateTime, nullable=False)
     category = Column(String, nullable=True)
     is_done = Column(Boolean, default=False, nullable=False)
@@ -40,26 +42,3 @@ class BucketList(Base):
     # 외래키
     user_id = Column(Integer, ForeignKey("user.id"), nullable=False)
     user = relationship("User", backref="bucketlist_users")
-
-
-# 버킷 내용
-class BucketContent(Base):
-    __tablename__ = "bucketcontent"
-
-    id = Column(Integer, primary_key=True)
-    content = Column(Text, nullable=True)
-    create_at = Column(DateTime, nullable=False)
-    updated_at = Column(DateTime, nullable=False)
-    # 외래키
-    bucketlist_id = Column(Integer, ForeignKey("bucketlist.id"), nullable=False)
-    bucketlist = relationship("BucketList", backref="bucketlist_contents")
-
-
-class BucketImage(Base):
-    __tablename__ = "bucketimage"
-
-    id = Column(Integer, primary_key=True)
-    image = Column(Text, nullable=True)
-    # 외래키
-    bucketcontent_id = Column(Integer, ForeignKey("bucketcontent.id"), nullable=False)
-    bucketcontent = relationship("BucketContent", backref="bucketcontent_image")
