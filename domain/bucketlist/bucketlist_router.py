@@ -11,10 +11,14 @@ router = APIRouter(
 
 
 # 모든 버킷리스트 가져오기
-@router.get("/list", response_model=list[bucketlist_schema.BucketList])
-def bucketlist_list(db: Session = Depends(get_db)):  # Depends를 사용하여 with문 대체
-    _bucketlist_list = bucketlist_crud.get_bucketlist_list(db)
-    return _bucketlist_list
+@router.get("/list", response_model=bucketlist_schema.BucketListList)
+def bucketlist_list(
+    db: Session = Depends(get_db), page: int = 0, size: int = 5
+):  # Depends를 사용하여 with문 대체
+    total, _bucketlist_list = bucketlist_crud.get_bucketlist_list(
+        db, skip=page * size, limit=size
+    )
+    return {"total": total, "bucketlist_list": _bucketlist_list}
 
 
 # 특정 버킷리스트 가져오기

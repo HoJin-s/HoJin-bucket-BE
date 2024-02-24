@@ -24,6 +24,12 @@ class BucketList(BaseModel):
     calender: datetime.date | None = None
 
 
+# 페이지 네이션 적용을 위한 class
+class BucketListList(BaseModel):
+    total: int = 0
+    bucketlist_list: list[BucketList] = []
+
+
 class BucketListCreate(BaseModel):
     title: str
     content: str
