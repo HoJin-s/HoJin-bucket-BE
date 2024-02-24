@@ -20,3 +20,8 @@ def create_user(db: Session, user_create: UserCreate):
     )
     db.add(db_user)
     db.commit()
+
+
+# OAuth 토큰 로그인
+def get_user(db: Session, username: str):
+    return db.query(User).filter(User.username == username).first()
