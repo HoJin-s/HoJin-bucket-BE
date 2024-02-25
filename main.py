@@ -3,6 +3,7 @@ from starlette.middleware.cors import CORSMiddleware
 
 from domain.bucketlist import bucketlist_router
 from domain.user import user_router
+from domain.review import review_router
 
 app = FastAPI()
 
@@ -20,3 +21,4 @@ app.add_middleware(
 
 app.include_router(bucketlist_router.router)
 app.include_router(user_router.router)
+app.include_router(review_router.router)

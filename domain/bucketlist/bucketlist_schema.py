@@ -9,22 +9,24 @@ Pydantic은 API의 입출력 항목을 다음과 같이 정의하고 검증할�
 import datetime
 
 from pydantic import BaseModel, field_validator
-from sqlalchemy import text
 
+from domain.review.review_schema import Review
 from domain.user.user_schema import User
 
 
+# 버킷리스트 모델
 class BucketList(BaseModel):
     id: int
     title: str
-    content: str
-    image: str
+    content: str | None = None
+    bucket_image: str | None = None
     created_at: datetime.datetime
     updated_at: datetime.datetime | None = None
     category: str | None = None
     is_done: bool
     calender: datetime.date | None = None
     user: User
+    reviews: list[Review] = []
 
 
 # 페이지 네이션 적용을 위한 class
@@ -36,12 +38,12 @@ class BucketListList(BaseModel):
 # 버킷리스트 생성
 class BucketListCreate(BaseModel):
     title: str
-    content: str
-    image: str
+    content: str | None = None
+    bucket_image: str | None = None
     category: str | None = None
     calender: datetime.date | None = None
 
-    @field_validator("title", "content", "image")
+    @field_validator("title")
     def not_empty(cls, v):
         if not v or not v.strip():
             raise ValueError("빈 값은 허용되지 않습니다.")
