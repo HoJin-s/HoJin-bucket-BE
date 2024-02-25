@@ -31,11 +31,8 @@ def create_bucketlist(db: Session, bucketlist_create: BucketListCreate, user: Us
         title=bucketlist_create.title,
         content=bucketlist_create.content,
         image=bucketlist_create.image,
-        category=bucketlist_create.category,
         created_at=datetime.now(),
-        updated_at=datetime.now(),
-        calender=datetime.now(),
-        is_done=False,
+        category=bucketlist_create.category,
         user=user,
     )
     db.add(db_bucketlist)
