@@ -33,14 +33,21 @@ class BucketListList(BaseModel):
     bucketlist_list: list[BucketList] = []
 
 
+# 버킷리스트 생성
 class BucketListCreate(BaseModel):
     title: str
     content: str
     image: str
     category: str | None = None
+    calender: datetime.date | None = None
 
     @field_validator("title", "content", "image")
     def not_empty(cls, v):
         if not v or not v.strip():
             raise ValueError("빈 값은 허용되지 않습니다.")
         return v
+
+
+# 버킷리스트 수정
+class BucketListUpdate(BucketListCreate):
+    bucketlist_id: int
