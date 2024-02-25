@@ -51,3 +51,8 @@ class BucketListCreate(BaseModel):
 # 버킷리스트 수정
 class BucketListUpdate(BucketListCreate):
     bucketlist_id: int
+
+
+# 버킷리스트 삭제
+class BucketListDelete(BaseModel):
+    bucketlist_id: int

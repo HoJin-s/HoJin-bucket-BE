@@ -51,3 +51,9 @@ def update_bucketlist(
     db_bucketlist.calender = bucketlist_update.calender
     db.add(db_bucketlist)
     db.commit()
+
+
+# 버킷리스트 삭제하기
+def delete_bucketlist(db: Session, db_bucketlist: BucketList):
+    db.delete(db_bucketlist)
+    db.commit()
