@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from domain.bucketlist.bucketlist_schema import BucketListCreate
+from domain.bucketlist.bucketlist_schema import BucketListCreate, BucketListUpdate
 
 from models import BucketList, User
 from sqlalchemy.orm import Session
@@ -33,7 +33,21 @@ def create_bucketlist(db: Session, bucketlist_create: BucketListCreate, user: Us
         image=bucketlist_create.image,
         created_at=datetime.now(),
         category=bucketlist_create.category,
+        calender=bucketlist_create.calender,
         user=user,
     )
+    db.add(db_bucketlist)
+    db.commit()
+
+
+# 버킷리스트 수정하기
+def update_bucketlist(
+    db: Session, db_bucketlist: BucketList, bucketlist_update: BucketListUpdate
+):
+    db_bucketlist.title = bucketlist_update.title
+    db_bucketlist.content = bucketlist_update.content
+    db_bucketlist.category = bucketlist_update.category
+    db_bucketlist.updated_at = datetime.now()
+    db_bucketlist.calender = bucketlist_update.calender
     db.add(db_bucketlist)
     db.commit()
