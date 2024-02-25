@@ -33,7 +33,7 @@ class BucketList(Base):
     id = Column(Integer, primary_key=True)
     title = Column(String, unique=True, nullable=False)
     content = Column(Text, nullable=True)
-    image = Column(Text, nullable=True)
+    bucket_image = Column(Text, nullable=True)
     created_at = Column(DateTime, nullable=False)
     updated_at = Column(DateTime, nullable=True)
     category = Column(String, nullable=True)
@@ -42,3 +42,22 @@ class BucketList(Base):
     # 외래키
     user_id = Column(Integer, ForeignKey("user.id"), nullable=False)
     user = relationship("User", backref="bucketlist_users")
+
+
+# 리뷰 게시글
+class Review(Base):
+    __tablename__ = "review"
+
+    id = Column(Integer, primary_key=True)
+    title = Column(String, nullable=False)
+    content = Column(Text, nullable=True)
+    review_image = Column(Text, nullable=True)
+    created_at = Column(DateTime, nullable=False)
+    updated_at = Column(DateTime, nullable=True)
+    completed_at = Column(Date, nullable=True)
+    # user 외래키
+    user_id = Column(Integer, ForeignKey("user.id"), nullable=False)
+    user = relationship("User", backref="review_users")
+    # bucketlist 외래키
+    bucketlist_id = Column(Integer, ForeignKey("bucketlist.id"), nullable=False)
+    bucketlist = relationship("BucketList", backref="review_bucketlist")
