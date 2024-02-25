@@ -32,7 +32,7 @@ def bucketlist_detail(bucketlist_id: int, db: Session = Depends(get_db)):
 
 
 # 버킷리스트 생성
-@router.post("/create", status_code=status.HTTP_204_NO_CONTENT)
+@router.post("/create", status_code=status.HTTP_201_CREATED)
 def bucketlist_create(
     _bucketlist_create: bucketlist_schema.BucketListCreate,
     db: Session = Depends(get_db),
@@ -44,7 +44,7 @@ def bucketlist_create(
 
 
 # 버킷리스트 수정
-@router.put("/update", status_code=status.HTTP_204_NO_CONTENT)
+@router.put("/update", status_code=status.HTTP_200_OK)
 def bucketlist_update(
     _bucketlist_update: bucketlist_schema.BucketListUpdate,
     db: Session = Depends(get_db),
@@ -64,3 +64,24 @@ def bucketlist_update(
     bucketlist_crud.update_bucketlist(
         db=db, db_bucketlist=db_bucketlist, bucketlist_update=_bucketlist_update
     )
+
+
+# 버킷리스트 삭제
+@router.delete("/delete", status_code=status.HTTP_204_NO_CONTENT)
+def bucketlist_delete(
+    _bucketlist_delete: bucketlist_schema.BucketListDelete,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    db_bucketlist = bucketlist_crud.get_bucketlist(
+        db, bucketlist_id=_bucketlist_delete.bucketlist_id
+    )
+    if not db_bucketlist:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="데이터를 찾을수 없습니다."
+        )
+    if current_user.id != db_bucketlist.user.id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="삭제 권한이 없습니다."
+        )
+    bucketlist_crud.delete_bucketlist(db=db, db_bucketlist=db_bucketlist)
