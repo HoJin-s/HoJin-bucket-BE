@@ -3,6 +3,9 @@ from sqlalchemy.orm import Session
 
 from database import get_db
 from domain.bucketlist import bucketlist_schema, bucketlist_crud
+from domain.user.user_router import get_current_user
+from models import User
+
 from starlette import status
 
 router = APIRouter(
@@ -32,5 +35,8 @@ def bucketlist_detail(bucketlist_id: int, db: Session = Depends(get_db)):
 def bucketlist_create(
     _bucketlist_create: bucketlist_schema.BucketListCreate,
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
-    bucketlist_crud.create_bucketlist(db=db, bucketlist_create=_bucketlist_create)
+    bucketlist_crud.create_bucketlist(
+        db=db, bucketlist_create=_bucketlist_create, user=current_user
+    )

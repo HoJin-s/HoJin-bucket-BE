@@ -11,6 +11,8 @@ import datetime
 from pydantic import BaseModel, field_validator
 from sqlalchemy import text
 
+from domain.user.user_schema import User
+
 
 class BucketList(BaseModel):
     id: int
@@ -22,6 +24,7 @@ class BucketList(BaseModel):
     category: str | None = None
     is_done: bool
     calender: datetime.date | None = None
+    user: User | None
 
 
 # 페이지 네이션 적용을 위한 class
