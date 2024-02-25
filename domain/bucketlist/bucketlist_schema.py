@@ -20,11 +20,11 @@ class BucketList(BaseModel):
     content: str
     image: str
     created_at: datetime.datetime
-    updated_at: datetime.datetime
+    updated_at: datetime.datetime | None = None
     category: str | None = None
     is_done: bool
     calender: datetime.date | None = None
-    user: User | None
+    user: User
 
 
 # 페이지 네이션 적용을 위한 class
@@ -37,7 +37,7 @@ class BucketListCreate(BaseModel):
     title: str
     content: str
     image: str
-    category: str
+    category: str | None = None
 
     @field_validator("title", "content", "image")
     def not_empty(cls, v):

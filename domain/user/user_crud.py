@@ -16,7 +16,6 @@ def create_user(db: Session, user_create: UserCreate):
         username=user_create.username,
         email=user_create.email,
         created_at=datetime.now(),
-        updated_at=datetime.now(),
     )
     db.add(db_user)
     db.commit()
