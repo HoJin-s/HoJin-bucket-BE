@@ -2,21 +2,24 @@ from datetime import datetime
 
 from domain.bucketlist.bucketlist_schema import BucketListCreate, BucketListUpdate
 
-from sqlalchemy import and_
+from sqlalchemy import and_, select, func
 from models import BucketList, User, Review
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 
 
 # 버킷리스트 전체 가져오기
-def get_bucketlist_list(db: Session, skip: int = 0, limit: int = 10, keyword: str = ""):
+async def get_bucketlist_list(
+    db: Session, skip: int = 0, limit: int = 10, keyword: str = ""
+):
     """
     - skip은 조회한 데이터의 시작위치
     - limit는 시작위치부터 가져올 데이터의 건수
-    (300개의 데이터 중에서 21 ~ 30 번째 데이터를 가져오려면 skip은 20, limit는 10)
+      (300개의 데이터 중에서 21 ~ 30 번째 데이터를 가져오려면 skip은 20, limit는 10)
 
     - 검색어(keyword)에 값이 있으면 그 값을 OR 조건으로 검색
+    - 비동기로 데이터를 조회하기 위해서는 db.query(Query) 대신 db.execute(select(Query))와 같은 방식을 사용해야함
     """
-    bucketlist_list = db.query(BucketList)
+    query = select(BucketList)
     if keyword:
         search = f"%%{keyword}%%"
         """
@@ -25,7 +28,7 @@ def get_bucketlist_list(db: Session, skip: int = 0, limit: int = 10, keyword: st
         Review.content, User.username : 리뷰내용, 리뷰 작성자
         """
         sub_query = (
-            db.query(Review.bucketlist_id, Review.content, User.username)
+            select(Review.bucketlist_id, Review.content, User.username)
             .outerjoin(User, and_(Review.user_id == User.id))
             .subquery()
         )
@@ -34,8 +37,8 @@ def get_bucketlist_list(db: Session, skip: int = 0, limit: int = 10, keyword: st
         .c 는 서브쿼리의 조회 항목을 의미함.
         ex) sub_query.c.bucketlist_id : 서브쿼리의 조회 항목 중 bucketlist_id 의미
         """
-        bucketlist_list = (
-            bucketlist_list.outerjoin(User)
+        query = (
+            query.outerjoin(User)
             .outerjoin(sub_query, and_(sub_query.c.bucketlist_id == BucketList.id))
             .filter(
                 BucketList.title.ilike(search)  # 버킷리스트 제목
@@ -45,27 +48,37 @@ def get_bucketlist_list(db: Session, skip: int = 0, limit: int = 10, keyword: st
                 | sub_query.c.username.ilike(search)  # 리뷰 작성자
             )
         )
-    # distinct 함수를 사용하여 중복 데이터 제거
-    total = bucketlist_list.distinct().count()
-    bucketlist_list = (
-        bucketlist_list.order_by(BucketList.created_at.desc())
+    total = await db.execute(select(func.count()).select_from(query))
+    bucketlist_list = await db.execute(
+        query.order_by(BucketList.created_at.desc())
         .offset(skip)
         .limit(limit)
         .distinct()
-        .all()
+        .options(selectinload(BucketList.reviews).selectinload(Review.user))
+        .options(selectinload(BucketList.user))
     )
 
-    return total, bucketlist_list  # 전체 건수, 페이징 적용된 질문 목록
+    return (
+        total.scalar_one(),
+        bucketlist_list.scalars().fetchall(),
+    )  # 전체 건수, 페이징 적용된 질문 목록
 
 
 # 특정 버킷리스트 가져오기
-def get_bucketlist(db: Session, bucketlist_id: int):
-    bucketlist = db.query(BucketList).get(bucketlist_id)
-    return bucketlist
+async def get_bucketlist(db: Session, bucketlist_id: int):
+    bucketlist = await db.execute(
+        select(BucketList)
+        .filter(BucketList.id == bucketlist_id)
+        .options(selectinload(BucketList.reviews).selectinload(Review.user))
+        .options(selectinload(BucketList.user))
+    )
+    return bucketlist.scalar_one()
 
 
 # 버킷리스트 생성하기
-def create_bucketlist(db: Session, bucketlist_create: BucketListCreate, user: User):
+async def create_bucketlist(
+    db: Session, bucketlist_create: BucketListCreate, user: User
+):
     db_bucketlist = BucketList(
         title=bucketlist_create.title,
         content=bucketlist_create.content,
@@ -76,11 +89,11 @@ def create_bucketlist(db: Session, bucketlist_create: BucketListCreate, user: Us
         user=user,
     )
     db.add(db_bucketlist)
-    db.commit()
+    await db.commit()
 
 
 # 버킷리스트 수정하기
-def update_bucketlist(
+async def update_bucketlist(
     db: Session, db_bucketlist: BucketList, bucketlist_update: BucketListUpdate
 ):
     db_bucketlist.title = bucketlist_update.title
@@ -90,10 +103,10 @@ def update_bucketlist(
     db_bucketlist.updated_at = datetime.now()
     db_bucketlist.calender = bucketlist_update.calender
     db.add(db_bucketlist)
-    db.commit()
+    await db.commit()
 
 
 # 버킷리스트 삭제하기
-def delete_bucketlist(db: Session, db_bucketlist: BucketList):
-    db.delete(db_bucketlist)
-    db.commit()
+async def delete_bucketlist(db: Session, db_bucketlist: BucketList):
+    await db.delete(db_bucketlist)
+    await db.commit()

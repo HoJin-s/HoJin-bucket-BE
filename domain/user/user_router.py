@@ -6,7 +6,7 @@ from jose import jwt, JWTError
 from sqlalchemy.orm import Session
 from starlette import status
 
-from database import get_db
+from database import get_db, get_async_db
 from domain.user import user_crud, user_schema
 from domain.user.user_crud import pwd_context
 
@@ -27,18 +27,27 @@ router = APIRouter(
 
 # 회원가입
 @router.post("/create", status_code=status.HTTP_201_CREATED)
-def user_create(_user_create: user_schema.UserCreate, db: Session = Depends(get_db)):
-    user_crud.create_user(db=db, user_create=_user_create)
+async def user_create(
+    _user_create: user_schema.UserCreate, db: Session = Depends(get_async_db)
+):
+    user = await user_crud.get_existing_user(db=db, user_create=_user_create)
+    print("user", user)
+    if user:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT, detail="이미 존재하는 사용자입니다."
+        )
+    await user_crud.create_user(db=db, user_create=_user_create)
 
 
 # 로그인
 @router.post("/login", response_model=user_schema.Token)
-def login_for_access_token(
-    form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)
+async def login_for_access_token(
+    form_data: OAuth2PasswordRequestForm = Depends(),
+    db: Session = Depends(get_async_db),
 ):  # fastapi의 security 패키지에 있는 OAuth2PasswordRequestForm 클래스를 사용
 
     # 유저 / 비밀번호 체크
-    user = user_crud.get_user(db, form_data.username)
+    user = await user_crud.get_user(db, form_data.username)
     if not user or not pwd_context.verify(form_data.password, user.password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -61,8 +70,8 @@ def login_for_access_token(
 
 
 # 로그인 확인(Token 유효성 검사)
-def get_current_user(
-    token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)
+async def get_current_user(
+    token: str = Depends(oauth2_scheme), db: Session = Depends(get_async_db)
 ):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -77,7 +86,7 @@ def get_current_user(
     except JWTError:
         raise credentials_exception
     else:
-        user = user_crud.get_user(db, username=username)
+        user = await user_crud.get_user(db, username=username)
         if user is None:
             raise credentials_exception
         return user
