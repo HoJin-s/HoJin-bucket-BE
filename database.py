@@ -8,7 +8,6 @@ import os
 load_dotenv()
 
 SQLALCHEMY_DATABASE_URL = os.getenv("SQLALCHEMY_DATABASE_URL")
-SQLALCHEMY_DATABASE_URL = "sqlite:///./hojin_project.db"
 
 if SQLALCHEMY_DATABASE_URL.startswith("sqlite"):
     engine = create_engine(

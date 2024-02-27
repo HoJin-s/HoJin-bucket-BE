@@ -60,4 +60,4 @@ class Review(Base):
     user = relationship("User", backref="review_users")
     # bucketlist 외래키
     bucketlist_id = Column(Integer, ForeignKey("bucketlist.id"), nullable=False)
-    bucketlist = relationship("BucketList", backref="review_bucketlist")
+    bucketlist = relationship("BucketList", backref="reviews")
