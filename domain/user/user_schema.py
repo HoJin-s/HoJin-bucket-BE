@@ -1,5 +1,20 @@
+from datetime import datetime
+from typing import Sequence
 from pydantic import BaseModel, field_validator, EmailStr
 from pydantic_core.core_schema import FieldValidationInfo
+
+
+# 회원 정보 가져오기
+class UserListResponse(BaseModel):
+    class _User(BaseModel):
+        id: int
+        username: str
+        email: EmailStr
+        created_at: datetime
+        is_admin: bool
+        is_active: bool
+
+    data: Sequence[_User]
 
 
 # 회원가입

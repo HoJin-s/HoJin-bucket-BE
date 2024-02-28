@@ -3,6 +3,7 @@ from fastapi import APIRouter, HTTPException
 from fastapi import Depends
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from jose import jwt, JWTError
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 from starlette import status
 
@@ -12,6 +13,8 @@ from domain.user.user_crud import pwd_context
 
 from dotenv import load_dotenv
 import os
+
+from models import User
 
 load_dotenv()
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))
@@ -23,6 +26,13 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/user/login")
 router = APIRouter(
     prefix="/api/user",
 )
+
+
+@router.get("/", response_model=user_schema.UserListResponse)
+async def get_users(db: Session = Depends(get_async_db)):
+    results = await db.execute(select(User))
+    users = results.scalars().all()
+    return {"data": users}
 
 
 # 회원가입
