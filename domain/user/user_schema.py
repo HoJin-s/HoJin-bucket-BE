@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Sequence
 from pydantic import BaseModel, field_validator, EmailStr
-from pydantic_core.core_schema import FieldValidationInfo
+from pydantic_core.core_schema import ValidationInfo
 
 
 # 회원 정보 가져오기
@@ -31,7 +31,7 @@ class UserCreate(BaseModel):
         return v
 
     @field_validator("password_check")
-    def passwords_match(cls, v, info: FieldValidationInfo):
+    def passwords_match(cls, v, info: ValidationInfo):
         if "password" in info.data and v != info.data["password"]:
             raise ValueError("비밀번호가 일치하지 않습니다")
         return v
