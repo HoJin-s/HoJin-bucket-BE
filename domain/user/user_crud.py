@@ -35,4 +35,4 @@ async def get_existing_user(db: Session, user_create: UserCreate):
 # OAuth 토큰 로그인
 async def get_user(db: Session, username: str):
     result = await db.execute(select(User).filter(User.username == username))
-    return result.scalar_one()
+    return result.scalar_one_or_none()

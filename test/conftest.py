@@ -1,6 +1,6 @@
 from typing import AsyncGenerator, Sequence
 from datetime import datetime
-
+from passlib.context import CryptContext
 import pytest_asyncio
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -31,10 +31,13 @@ async def test_session() -> AsyncGenerator[AsyncSession, None]:
 # 유저 1명 생성
 @pytest_asyncio.fixture
 async def one_test_user(test_session: AsyncSession) -> User:
+
     test_user = User(
         email="one_test_user@gmail.com",
         username="one_test_user",
-        password="one_test_user",
+        password=CryptContext(schemes=["bcrypt"], deprecated="auto").hash(
+            "one_test_user"
+        ),
         created_at=datetime.now(),
     )
     test_session.add(test_user)

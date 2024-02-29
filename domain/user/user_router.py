@@ -58,10 +58,16 @@ async def login_for_access_token(
 
     # 유저 / 비밀번호 체크
     user = await user_crud.get_user(db, form_data.username)
-    if not user or not pwd_context.verify(form_data.password, user.password):
+    if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="사용자 또는 비밀번호가 일치하지 않습니다.",
+            detail="존재하지 않는 아이디입니다.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    elif not pwd_context.verify(form_data.password, user.password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="비밀번호가 일치하지 않습니다.",
             headers={"WWW-Authenticate": "Bearer"},
         )
 
