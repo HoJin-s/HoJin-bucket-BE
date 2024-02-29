@@ -28,13 +28,13 @@ async def test_session() -> AsyncGenerator[AsyncSession, None]:
         await db.close()
 
 
-# 유저 1명 GET 테스트
+# 유저 1명 생성
 @pytest_asyncio.fixture
 async def one_test_user(test_session: AsyncSession) -> User:
     test_user = User(
-        email="twicegoddessana1229@gmail.com",
-        username="twicegoddessana1229",
-        password="twicegoddessana1229",
+        email="one_test_user@gmail.com",
+        username="one_test_user",
+        password="one_test_user",
         created_at=datetime.now(),
     )
     test_session.add(test_user)
@@ -42,7 +42,7 @@ async def one_test_user(test_session: AsyncSession) -> User:
     return test_user
 
 
-# 유저 50명 GET 테스트
+# 유저 50명 생성
 @pytest_asyncio.fixture
 async def fifty_test_users(test_session: AsyncSession) -> Sequence[User]:
     test_users = [

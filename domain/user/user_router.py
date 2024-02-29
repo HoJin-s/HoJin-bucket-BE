@@ -28,6 +28,7 @@ router = APIRouter(
 )
 
 
+# 회원 정보 가져오기
 @router.get("/", response_model=user_schema.UserListResponse)
 async def get_users(db: Session = Depends(get_async_db)):
     results = await db.execute(select(User))
@@ -41,7 +42,6 @@ async def user_create(
     _user_create: user_schema.UserCreate, db: Session = Depends(get_async_db)
 ):
     user = await user_crud.get_existing_user(db=db, user_create=_user_create)
-    print("user", user)
     if user:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT, detail="이미 존재하는 사용자입니다."

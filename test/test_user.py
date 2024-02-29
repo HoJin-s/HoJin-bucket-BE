@@ -1,5 +1,5 @@
 from typing import Sequence
-
+from sqlalchemy import select
 import pytest
 from fastapi.testclient import TestClient
 from fastapi import status
@@ -45,3 +45,4 @@ async def test_read_user_list_with_fifty_users(
     assert len(response.json()["data"]) == 50
     assert response.json()["data"][0]["email"] == fifty_test_users[0].email
     assert response.json()["data"][49]["email"] == fifty_test_users[49].email
+
