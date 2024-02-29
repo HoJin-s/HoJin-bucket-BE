@@ -3,6 +3,7 @@ from fastapi import APIRouter, HTTPException
 from fastapi import Depends
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from jose import jwt, JWTError
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 from starlette import status
 
@@ -12,6 +13,8 @@ from domain.user.user_crud import pwd_context
 
 from dotenv import load_dotenv
 import os
+
+from models import User
 
 load_dotenv()
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))
@@ -25,13 +28,20 @@ router = APIRouter(
 )
 
 
+# 회원 정보 가져오기
+@router.get("/", response_model=user_schema.UserListResponse)
+async def get_users(db: Session = Depends(get_async_db)):
+    results = await db.execute(select(User))
+    users = results.scalars().all()
+    return {"data": users}
+
+
 # 회원가입
 @router.post("/create", status_code=status.HTTP_201_CREATED)
 async def user_create(
     _user_create: user_schema.UserCreate, db: Session = Depends(get_async_db)
 ):
     user = await user_crud.get_existing_user(db=db, user_create=_user_create)
-    print("user", user)
     if user:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT, detail="이미 존재하는 사용자입니다."
@@ -48,10 +58,16 @@ async def login_for_access_token(
 
     # 유저 / 비밀번호 체크
     user = await user_crud.get_user(db, form_data.username)
-    if not user or not pwd_context.verify(form_data.password, user.password):
+    if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="사용자 또는 비밀번호가 일치하지 않습니다.",
+            detail="존재하지 않는 아이디입니다.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    elif not pwd_context.verify(form_data.password, user.password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="비밀번호가 일치하지 않습니다.",
             headers={"WWW-Authenticate": "Bearer"},
         )
 
