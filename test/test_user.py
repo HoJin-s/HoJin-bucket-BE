@@ -5,8 +5,18 @@ from fastapi.testclient import TestClient
 from fastapi import status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from models import User, BucketList, Review
+from models import User
 from main import app
+from datetime import timedelta, datetime
+from jose import jwt
+from dotenv import load_dotenv
+import os
+
+# 로그인 테스트 시, 사용
+load_dotenv()
+ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))
+SECRET_KEY = os.getenv("SECRET_KEY")
+ALGORITHM = os.getenv("ALGORITHM")
 
 client = TestClient(app)
 
@@ -183,3 +193,63 @@ async def test_password_is_hashed(test_session: AsyncSession) -> None:
     results = await test_session.execute(select(User))
     users = results.scalars().all()
     assert users[0].password != "password"
+
+
+# 로그인 POST 유저정보 테스트
+@pytest.mark.asyncio
+async def test_user_login_success(
+    one_test_user: User,
+) -> None:
+    response = client.post(
+        url="/api/user/login",
+        data={
+            "username": one_test_user.username,
+            "password": "one_test_user",
+        },
+    )
+
+    access_token_data = {
+        "sub": one_test_user.username,
+        "exp": datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
+    }
+    access_token = jwt.encode(access_token_data, SECRET_KEY, algorithm=ALGORITHM)
+
+    assert response.status_code == status.HTTP_200_OK
+    assert "access_token" in response.json()
+    assert "token_type" in response.json()
+    assert "username" in response.json()
+    assert response.json()["access_token"] == access_token
+    assert response.json()["token_type"] == "bearer"
+    assert response.json()["username"] == one_test_user.username
+
+
+# 로그인 POST 시, username 체크
+@pytest.mark.asyncio
+async def test_user_login_failure_username_dismatch(
+    one_test_user: User,
+) -> None:
+    response = client.post(
+        url="/api/user/login",
+        data={
+            "username": f"wrong_{one_test_user.username}",  # username 없을 때
+            "password": "one_test_user",
+        },
+    )
+
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+
+# 로그인 POST 시, password 체크
+@pytest.mark.asyncio
+async def test_user_login_failure_password_dismatch(
+    one_test_user: User,
+) -> None:
+    response = client.post(
+        url="/api/user/login",
+        data={
+            "username": one_test_user.username,
+            "password": "wrong_password",  # password 불일치
+        },
+    )
+
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
