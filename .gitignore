@@ -105,6 +105,7 @@ instance/
 # fastapi stuff:
 hojin_project.db
 hojin_project_test.db
+migrations/versions/
 
 # Scrapy stuff:
 .scrapy
