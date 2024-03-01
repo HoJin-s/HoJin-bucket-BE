@@ -28,7 +28,7 @@ async def get_bucketlist_list(
         Review.content, User.username : 리뷰내용, 리뷰 작성자
         """
         sub_query = (
-            select(Review.bucketlist_id, Review.content, User.username)
+            select(Review.bucketlist_id, Review.title, Review.content, User.username)
             .outerjoin(User, and_(Review.user_id == User.id))
             .subquery()
         )
@@ -44,6 +44,7 @@ async def get_bucketlist_list(
                 BucketList.title.ilike(search)  # 버킷리스트 제목
                 | BucketList.content.ilike(search)  # 버킷리스트 내용
                 | User.username.ilike(search)  # 버킷리스트 작성자
+                | sub_query.c.title.ilike(search)  # 리뷰 제목
                 | sub_query.c.content.ilike(search)  # 리뷰 내용
                 | sub_query.c.username.ilike(search)  # 리뷰 작성자
             )
