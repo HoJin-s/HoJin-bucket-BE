@@ -73,7 +73,7 @@ async def get_bucketlist(db: Session, bucketlist_id: int):
         .options(selectinload(BucketList.reviews).selectinload(Review.user))
         .options(selectinload(BucketList.user))
     )
-    return bucketlist.scalar_one()
+    return bucketlist.scalar_one_or_none()
 
 
 # 버킷리스트 생성하기
