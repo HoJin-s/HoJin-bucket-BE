@@ -12,6 +12,7 @@ from pydantic import BaseModel, field_validator
 
 from domain.review.review_schema import Review
 from domain.user.user_schema import User
+from models import BucketListCategoryEnum
 
 
 # 버킷리스트 모델
@@ -22,7 +23,7 @@ class BucketList(BaseModel):
     bucket_image: str | None = None
     created_at: datetime.datetime
     updated_at: datetime.datetime | None = None
-    category: str | None = None
+    category: BucketListCategoryEnum | None = None
     is_done: bool
     calender: datetime.date | None = None
     user: User
@@ -40,7 +41,7 @@ class BucketListCreate(BaseModel):
     title: str
     content: str | None = None
     bucket_image: str | None = None
-    category: str | None = None
+    category: BucketListCategoryEnum | None = None
     calender: datetime.date | None = None
 
     @field_validator("title")
