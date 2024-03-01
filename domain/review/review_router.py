@@ -14,15 +14,29 @@ router = APIRouter(
 )
 
 
-# 해당 리뷰 가져오기
-@router.get("/detail/{review_id}", response_model=review_schema.Review)
+# 특정 리뷰 가져오기
+@router.get(
+    "/detail/{review_id}",
+    response_model=review_schema.Review,
+    tags=(["Review"]),
+    summary=("특정 리뷰 가져오기"),
+    description=("review_id : 가져오고싶은 Review의 id (PK) 값을 입력"),
+)
 async def review_detail(review_id: int, db: Session = Depends(get_async_db)):
     review = await review_crud.get_review(db, review_id=review_id)
     return review
 
 
 # 리뷰 생성
-@router.post("/create/{bucketlist_id}", status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/create/{bucketlist_id}",
+    status_code=status.HTTP_201_CREATED,
+    tags=(["Review"]),
+    summary=("리뷰 생성"),
+    description=(
+        "title : 제목 \n\n content : 내용 \n\n review_image : 넣을 이미지 URL \n\n completed_at : 버킷리스트 완료 날짜 ('0000-00-00' 형태로 입력)"
+    ),
+)
 async def review_create(
     bucketlist_id: int,
     _review_create: review_schema.ReviewCreate,
@@ -38,7 +52,15 @@ async def review_create(
 
 
 # 리뷰 수정
-@router.put("/update", status_code=status.HTTP_200_OK)
+@router.put(
+    "/update",
+    status_code=status.HTTP_200_OK,
+    tags=(["Review"]),
+    summary=("리뷰 수정"),
+    description=(
+        "title : 제목 \n\n content : 내용 \n\n review_image : 넣을 이미지 URL \n\n completed_at : 버킷리스트 완료 날짜 ('0000-00-00' 형태로 입력) \n\n review_id : 수정하고싶은 Review의 id (PK) 값을 입력"
+    ),
+)
 async def review_update(
     _review_update: review_schema.ReviewUpdate,
     db: Session = Depends(get_async_db),
@@ -59,7 +81,13 @@ async def review_update(
 
 
 # 리뷰 삭제
-@router.delete("/delete", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete(
+    "/delete",
+    status_code=status.HTTP_204_NO_CONTENT,
+    tags=(["Review"]),
+    summary=("리뷰 삭제"),
+    description=("review_id : 삭제하고싶은 Review의 id (PK) 값을 입력"),
+)
 async def review_delete(
     _review_delete: review_schema.ReviewDelete,
     db: Session = Depends(get_async_db),

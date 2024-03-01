@@ -28,8 +28,13 @@ router = APIRouter(
 )
 
 
-# 회원 정보 가져오기
-@router.get("/", response_model=user_schema.UserListResponse)
+# 회원 정보 전체 가져오기
+@router.get(
+    "/",
+    response_model=user_schema.UserListResponse,
+    tags=(["User"]),
+    summary=("회원 정보 전체 가져오기"),
+)
 async def get_users(db: Session = Depends(get_async_db)):
     results = await db.execute(select(User))
     users = results.scalars().all()
@@ -37,7 +42,15 @@ async def get_users(db: Session = Depends(get_async_db)):
 
 
 # 회원가입
-@router.post("/create", status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/create",
+    status_code=status.HTTP_201_CREATED,
+    tags=(["User"]),
+    summary=("회원가입"),
+    description=(
+        "password : 비밀번호 \n\n password_check : 비밀번호 확인 (password와 동일한 값 입력) \n\n username : 이름 (로그인 시 사용) \n\n email : 이메일 형태로 입력 "
+    ),
+)
 async def user_create(
     _user_create: user_schema.UserCreate, db: Session = Depends(get_async_db)
 ):
@@ -50,7 +63,13 @@ async def user_create(
 
 
 # 로그인
-@router.post("/login", response_model=user_schema.Token)
+@router.post(
+    "/login",
+    response_model=user_schema.Token,
+    tags=(["User"]),
+    summary=("로그인"),
+    description=("username : 회원가입 이름 \n\n password : 회원가입 비밀번호"),
+)
 async def login_for_access_token(
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_async_db),
