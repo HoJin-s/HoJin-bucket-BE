@@ -2,10 +2,31 @@ from typing import AsyncGenerator, Sequence
 from datetime import datetime
 from passlib.context import CryptContext
 import pytest_asyncio
-from sqlalchemy.ext.asyncio import AsyncSession
-
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
+from fastapi.testclient import TestClient
 from models import User, BucketList, Review
-from database import async_engine, Base, AsyncSessionLocal
+from database import Base, get_async_db, AsyncSessionLocal
+from main import app
+
+
+SQLALCHEMY_DATABASE_URL_ASYNC_TEST = "sqlite+aiosqlite:///hojin_project_test.db"
+async_engine = create_async_engine(SQLALCHEMY_DATABASE_URL_ASYNC_TEST, echo=False)
+TestingAsyncSessionLocal = async_sessionmaker(
+    autocommit=False,
+    bind=async_engine,
+    class_=AsyncSession,
+    expire_on_commit=False,
+)
+
+
+@pytest_asyncio.fixture
+async def test_session() -> AsyncGenerator[AsyncSession, None]:
+    """테스트를 위한 데이터베이스 세션 생성"""
+    db = TestingAsyncSessionLocal()
+    try:
+        yield db
+    finally:
+        await db.close()
 
 
 @pytest_asyncio.fixture(autouse=True)
@@ -18,14 +39,19 @@ async def create_tables() -> AsyncGenerator[None, None]:
         await conn.run_sync(Base.metadata.drop_all)
 
 
-@pytest_asyncio.fixture
-async def test_session() -> AsyncGenerator[AsyncSession, None]:
-    """테스트를 위한 데이터베이스 세션 생성"""
-    db = AsyncSessionLocal()
-    try:
-        yield db
-    finally:
-        await db.close()
+@pytest_asyncio.fixture(autouse=True)
+async def client(test_session):
+    """종속성 오버라이딩"""
+
+    async def override_get_async_db():
+        try:
+            yield test_session
+        finally:
+            await test_session.close()
+
+    app.dependency_overrides[get_async_db] = override_get_async_db
+
+    yield TestClient(app)
 
 
 # 유저 1명 생성
@@ -60,3 +86,51 @@ async def fifty_test_users(test_session: AsyncSession) -> Sequence[User]:
     test_session.add_all(test_users)
     await test_session.commit()
     return test_users
+
+
+# # 글 1개 생성
+# @pytest_asyncio.fixture
+# async def one_test_bucketlist(
+#     one_test_user: User, test_session: AsyncSession
+# ) -> BucketList:
+
+#     one_test_bucketlist = BucketList(
+#         title="one_test_bucketlist_title@gmail.com",
+#         content="one_test_bucketlist_content",
+#         bucket_image="one_test_bucket_image",
+#         created_at=datetime.now(),
+#         user={
+#             "id": one_test_user.id,
+#             "username": one_test_user.username,
+#             "email": one_test_user.email,
+#         },
+#         reviews=[],
+#     )
+#     test_session.add(one_test_bucketlist)
+#     await test_session.commit()
+#     return one_test_bucketlist
+
+
+# # 글 15개 생성
+# @pytest_asyncio.fixture
+# async def fifteen_test_bucketlist(
+#     one_test_user: User, test_session: AsyncSession
+# ) -> Sequence[BucketList]:
+#     test_bucketlists = [
+#         BucketList(
+#             title=f"test_bucketlist_title_{i+1}",
+#             content=f"test_bucketlist_content_{i+1}",
+#             bucket_image=f"test_bucket_image_{i+1}",
+#             created_at=datetime.now(),
+#             user={
+#                 "id": one_test_user.id,
+#                 "username": one_test_user.username,
+#                 "email": one_test_user.email,
+#             },
+#             reviews=[],
+#         )
+#         for i in range(15)
+#     ]
+#     test_session.add_all(test_bucketlists)
+#     await test_session.commit()
+#     return test_bucketlists
