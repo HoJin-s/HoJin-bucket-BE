@@ -10,6 +10,8 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import relationship
 from database import Base
+from enum import Enum
+from sqlalchemy import Enum as SQLEnum
 
 
 # 회원
@@ -26,6 +28,20 @@ class User(Base):
     is_active = Column(Boolean, default=True, nullable=False)  # 추후 변경
 
 
+# Enum 정의
+class BucketListCategoryEnum(str, Enum):
+    음식점 = "음식점"
+    카페 = "카페"
+    체험 = "체험"
+    액티비티 = "액티비티"
+    여행 = "여행"
+    쇼핑 = "쇼핑"
+    운동 = "운동"
+    게임 = "게임"
+    영화 = "영화"
+    기타 = "기타"
+
+
 # 버킷 게시글
 class BucketList(Base):
     __tablename__ = "bucketlist"
@@ -36,7 +52,7 @@ class BucketList(Base):
     bucket_image = Column(Text, nullable=True)
     created_at = Column(DateTime, nullable=False)
     updated_at = Column(DateTime, nullable=True)
-    category = Column(String, nullable=True)
+    category = Column(SQLEnum(BucketListCategoryEnum), nullable=True)
     is_done = Column(Boolean, default=False, nullable=False)
     calender = Column(Date, nullable=True)
     # 외래키
