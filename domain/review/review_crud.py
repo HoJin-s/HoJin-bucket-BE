@@ -12,7 +12,7 @@ async def get_review(db: Session, review_id: int):
     review = await db.execute(
         select(Review).filter(Review.id == review_id).options(selectinload(Review.user))
     )
-    return review.scalar_one()
+    return review.scalar_one_or_none()
 
 
 # 리뷰 생성하기

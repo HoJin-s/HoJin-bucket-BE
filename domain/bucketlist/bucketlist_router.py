@@ -44,7 +44,13 @@ async def bucketlist_list(
     description=("bucketlist_id : 가져오고싶은 BucketList의 id (PK) 값을 입력"),
 )
 async def bucketlist_detail(bucketlist_id: int, db: Session = Depends(get_async_db)):
+
     bucketlist = await bucketlist_crud.get_bucketlist(db, bucketlist_id=bucketlist_id)
+    if not bucketlist:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="해당 게시글을 찾을 수 없습니다.",
+        )
     return bucketlist
 
 
@@ -88,7 +94,8 @@ async def bucketlist_update(
     )
     if not db_bucketlist:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="데이터를 찾을수 없습니다."
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="해당 게시글을 찾을 수 없습니다.",
         )
     if current_user.id != db_bucketlist.user.id:
         raise HTTPException(
@@ -117,7 +124,8 @@ async def bucketlist_delete(
     )
     if not db_bucketlist:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="데이터를 찾을수 없습니다."
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="해당 게시글을 찾을 수 없습니다.",
         )
     if current_user.id != db_bucketlist.user.id:
         raise HTTPException(

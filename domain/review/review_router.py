@@ -24,6 +24,11 @@ router = APIRouter(
 )
 async def review_detail(review_id: int, db: Session = Depends(get_async_db)):
     review = await review_crud.get_review(db, review_id=review_id)
+    if not review:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="해당 리뷰를 찾을 수 없습니다.",
+        )
     return review
 
 
@@ -69,7 +74,8 @@ async def review_update(
     db_review = await review_crud.get_review(db, review_id=_review_update.review_id)
     if not db_review:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="데이터를 찾을수 없습니다."
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="해당 리뷰를 찾을 수 없습니다.",
         )
     if current_user.id != db_review.user.id:
         raise HTTPException(
@@ -96,7 +102,8 @@ async def review_delete(
     db_review = await review_crud.get_review(db, review_id=_review_delete.review_id)
     if not db_review:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="데이터를 찾을수 없습니다."
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="해당 리뷰를 찾을 수 없습니다.",
         )
     if current_user.id != db_review.user.id:
         raise HTTPException(
