@@ -1,6 +1,12 @@
 # Created by https://www.toptal.com/developers/gitignore/api/visualstudiocode,python,macos
 # Edit at https://www.toptal.com/developers/gitignore?templates=visualstudiocode,python,macos
 
+# fastapi stuff:
+hojin_project.db
+hojin_project_test.db
+migrations/versions/
+image_file/*
+
 ### macOS ###
 # General
 .DS_Store
@@ -101,11 +107,6 @@ db.sqlite3-journal
 # Flask stuff:
 instance/
 .webassets-cache
-
-# fastapi stuff:
-hojin_project.db
-hojin_project_test.db
-migrations/versions/
 
 # Scrapy stuff:
 .scrapy
