@@ -22,7 +22,6 @@ async def create_review(
     db_review = Review(
         title=review_create.title,
         content=review_create.content,
-        review_image=review_create.review_image,
         created_at=datetime.now(),
         completed_at=review_create.completed_at,
         user=user,
@@ -36,7 +35,6 @@ async def create_review(
 async def update_review(db: Session, db_review: Review, review_update: ReviewUpdate):
     db_review.title = review_update.title
     db_review.content = review_update.content
-    db_review.review_image = review_update.review_image
     db_review.updated_at = datetime.now()
     db_review.completed_at = review_update.completed_at
     db.add(db_review)

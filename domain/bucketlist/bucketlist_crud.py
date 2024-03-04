@@ -83,7 +83,6 @@ async def create_bucketlist(
     db_bucketlist = BucketList(
         title=bucketlist_create.title,
         content=bucketlist_create.content,
-        bucket_image=bucketlist_create.bucket_image,
         created_at=datetime.now(),
         category=bucketlist_create.category,
         calender=bucketlist_create.calender,
@@ -99,7 +98,6 @@ async def update_bucketlist(
 ):
     db_bucketlist.title = bucketlist_update.title
     db_bucketlist.content = bucketlist_update.content
-    db_bucketlist.bucket_image = bucketlist_update.bucket_image
     db_bucketlist.category = bucketlist_update.category
     db_bucketlist.updated_at = datetime.now()
     db_bucketlist.calender = bucketlist_update.calender

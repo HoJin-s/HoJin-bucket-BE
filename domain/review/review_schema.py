@@ -17,7 +17,6 @@ class Review(BaseModel):
     id: int
     title: str
     content: str | None = None
-    review_image: str | None = None
     created_at: datetime.datetime
     updated_at: datetime.datetime | None = None
     completed_at: datetime.date | None = None
@@ -29,7 +28,6 @@ class Review(BaseModel):
 class ReviewCreate(BaseModel):
     title: str
     content: str | None = None
-    review_image: str | None = None
     completed_at: datetime.date | None = None
 
     @field_validator("title")
