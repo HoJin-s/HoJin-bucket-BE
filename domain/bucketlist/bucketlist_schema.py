@@ -20,7 +20,6 @@ class BucketList(BaseModel):
     id: int
     title: str
     content: str | None = None
-    bucket_image: str | None = None
     created_at: datetime.datetime
     updated_at: datetime.datetime | None = None
     category: BucketListCategoryEnum | None = None
@@ -40,7 +39,6 @@ class BucketListList(BaseModel):
 class BucketListCreate(BaseModel):
     title: str
     content: str | None = None
-    bucket_image: str | None = None
     category: BucketListCategoryEnum | None = None
     calender: datetime.date | None = None
 
