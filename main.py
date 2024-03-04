@@ -13,6 +13,7 @@ import os
 load_dotenv(override=True)
 BE_URL = os.getenv("BE_URL")
 FE_URL = os.getenv("FE_URL")
+UPLOAD_DIR = "./image_file"
 
 app = FastAPI()
 
@@ -33,4 +34,6 @@ app.include_router(user_router.router)
 app.include_router(review_router.router)
 # 이미지파일 저장
 app.include_router(image_router.router)
-app.mount("/image_file", StaticFiles(directory="./image_file"), name="image_files")
+
+if os.path.exists(UPLOAD_DIR):
+    app.mount("/image_file", StaticFiles(directory="./image_file"), name="image_files")

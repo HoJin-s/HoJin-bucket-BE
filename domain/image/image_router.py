@@ -36,9 +36,6 @@ async def create_image(
     file_path = os.path.join(UPLOAD_DIR, filename)
     file_url = f"{BE_URL}{file_path[1:]}"
 
-    with open(file_path, "wb") as fp:
-        fp.write(content)  # 서버 로컬 스토리지에 이미지 저장 (쓰기)
-
     if bucketlist_id is not None:
         # bucketlist_id가 유효한지 확인
         bucketlist = await db.get(BucketList, bucketlist_id)
@@ -62,12 +59,14 @@ async def create_image(
             status_code=status.HTTP_406_NOT_ACCEPTABLE,
             detail="bucketlist_id와 review_id 둘 중 하나를 선택하세요.",
         )
-
-    if bucketlist_id is not None and review_id is not None:
+    elif bucketlist_id is not None and review_id is not None:
         raise HTTPException(
             status_code=status.HTTP_406_NOT_ACCEPTABLE,
             detail="bucketlist_id와 review_id를 모두 입력할 수 없습니다.",
         )
+    else:
+        with open(file_path, "wb") as fp:
+            fp.write(content)  # 서버 로컬 스토리지에 이미지 저장 (쓰기)
 
     await image_crud.create_image(
         db=db,
