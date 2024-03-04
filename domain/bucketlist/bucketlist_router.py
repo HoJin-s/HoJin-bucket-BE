@@ -72,6 +72,7 @@ async def bucketlist_create(
     await bucketlist_crud.create_bucketlist(
         db=db, bucketlist_create=_bucketlist_create, user=current_user
     )
+    return {"status": "201", "success": "버킷리스트 생성완료"}
 
 
 # 버킷리스트 수정
@@ -104,6 +105,7 @@ async def bucketlist_update(
     await bucketlist_crud.update_bucketlist(
         db=db, db_bucketlist=db_bucketlist, bucketlist_update=_bucketlist_update
     )
+    return {"status": "200", "success": "버킷리스트 수정완료"}
 
 
 # 버킷리스트 삭제
@@ -132,3 +134,5 @@ async def bucketlist_delete(
             status_code=status.HTTP_400_BAD_REQUEST, detail="삭제 권한이 없습니다."
         )
     await bucketlist_crud.delete_bucketlist(db=db, db_bucketlist=db_bucketlist)
+
+    return {"status": "204", "success": "버킷리스트 삭제완료"}

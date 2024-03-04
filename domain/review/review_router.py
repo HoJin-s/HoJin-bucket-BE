@@ -54,6 +54,7 @@ async def review_create(
     await review_crud.create_review(
         db=db, bucketlist=bucketlist, review_create=_review_create, user=current_user
     )
+    return {"status": "201", "success": "리뷰 생성완료"}
 
 
 # 리뷰 수정
@@ -84,6 +85,7 @@ async def review_update(
     await review_crud.update_review(
         db=db, db_review=db_review, review_update=_review_update
     )
+    return {"status": "200", "success": "리뷰 수정완료"}
 
 
 # 리뷰 삭제
@@ -110,3 +112,4 @@ async def review_delete(
             status_code=status.HTTP_400_BAD_REQUEST, detail="삭제 권한이 없습니다."
         )
     await review_crud.delete_review(db=db, db_review=db_review)
+    return {"status": "204", "success": "리뷰 삭제완료"}
