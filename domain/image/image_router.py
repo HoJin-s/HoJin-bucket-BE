@@ -1,9 +1,10 @@
-from fastapi import APIRouter, File, UploadFile, Depends, HTTPException
+from fastapi import APIRouter, Body, File, UploadFile, Depends, HTTPException
 from sqlalchemy.orm import Session
 from database import get_async_db
-from domain.image import image_schema
-from models import BucketList, Image, Review
+from domain.image import image_crud
+from models import BucketList, Review
 from starlette import status
+from domain.image.image_schema import ImageCreate
 import os
 import uuid
 from dotenv import load_dotenv
@@ -18,8 +19,9 @@ router = APIRouter(
 UPLOAD_DIR = "./image_file"
 
 
-@router.post("/image", status_code=status.HTTP_201_CREATED)
-async def upload_image(
+# 이미지 생성하기
+@router.post("/create", status_code=status.HTTP_201_CREATED, response_model=ImageCreate)
+async def create_image(
     bucketlist_id: int = None,
     review_id: int = None,
     file: UploadFile = File(...),
@@ -55,16 +57,26 @@ async def upload_image(
                 detail="해당 리뷰를 찾을 수 없습니다.",
             )
 
+    if bucketlist_id is None and review_id is None:
+        raise HTTPException(
+            status_code=status.HTTP_406_NOT_ACCEPTABLE,
+            detail="bucketlist_id와 review_id 둘 중 하나를 선택하세요.",
+        )
+
     if bucketlist_id is not None and review_id is not None:
         raise HTTPException(
             status_code=status.HTTP_406_NOT_ACCEPTABLE,
             detail="bucketlist_id와 review_id를 모두 입력할 수 없습니다.",
         )
 
-    db_image = Image(
-        data=file_path[1:], bucketlist_id=bucketlist_id, review_id=review_id
+    await image_crud.create_image(
+        db=db,
+        data=file_url,
+        bucketlist_id=bucketlist_id,
+        review_id=review_id,
     )
-    db.add(db_image)
-    await db.commit()
-
-    return {"filename": filename, "file_url": file_url}
+    return {
+        "data": file_url,
+        "bucketlist_id": bucketlist_id,
+        "review_id": review_id,
+    }

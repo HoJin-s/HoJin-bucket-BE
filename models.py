@@ -82,7 +82,7 @@ class Image(Base):
     __tablename__ = "image"
 
     id = Column(Integer, primary_key=True)
-    data = Column(String, nullable=True)
+    data = Column(String, nullable=False)
 
     # bucketlist 외래키
     bucketlist_id = Column(Integer, ForeignKey("bucketlist.id"), nullable=True)
