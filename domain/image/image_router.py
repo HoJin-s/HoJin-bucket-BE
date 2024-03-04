@@ -1,8 +1,9 @@
-from fastapi import APIRouter, Body, File, UploadFile, Depends, HTTPException
+from fastapi import APIRouter, File, UploadFile, Depends, HTTPException
 from sqlalchemy.orm import Session
+from sqlalchemy import event
 from database import get_async_db
 from domain.image import image_crud
-from models import BucketList, Review
+from models import BucketList, Image, Review
 from starlette import status
 from domain.image.image_schema import ImageCreate
 import os
@@ -43,7 +44,7 @@ async def create_image(
     content = await file.read()
     filename = f"{str(uuid.uuid4())}.jpg"  # uuid로 유니크한 파일명으로 변경
     file_path = os.path.join(UPLOAD_DIR, filename)
-    file_url = f"{BE_URL}{file_path[1:]}"
+    file_url = f"{BE_URL}/image_file\\{filename}"
 
     if bucketlist_id is not None:
         # bucketlist_id가 유효한지 확인
@@ -88,3 +89,19 @@ async def create_image(
         "bucketlist_id": bucketlist_id,
         "review_id": review_id,
     }
+
+
+# 이미지가 DB에서 삭제될 때, 해당 이미지 파일을 sqlalchemy의 event.listen으로 삭제하는 함수
+# 이벤트 리스너는 동기적인 방식으로 동작하므로, 하나의 트랜젝션이라고 생각하여 동기방식으로 구현
+def delete_image_file(target):
+    target_data = target.data.split("/")[3][11:]
+    file_path = os.path.join(UPLOAD_DIR, target_data)
+    if os.path.exists(file_path):
+        os.remove(file_path)
+
+
+def delete_image_file_on_delete(mapper, connection, target):
+    delete_image_file(target)
+
+
+event.listen(Image, "before_delete", delete_image_file_on_delete)
