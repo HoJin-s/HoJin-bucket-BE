@@ -20,7 +20,16 @@ UPLOAD_DIR = "./image_file"
 
 
 # 이미지 생성하기
-@router.post("/create", status_code=status.HTTP_201_CREATED, response_model=ImageCreate)
+@router.post(
+    "/create",
+    status_code=status.HTTP_201_CREATED,
+    response_model=ImageCreate,
+    tags=(["Image"]),
+    summary=("이미지 생성"),
+    description=(
+        "※ bucketlist_id / review_id 둘 중 하나만 입력 ※ \n\n bucketlist_id : 이미지를 생성할 BucketList의 id (PK) 값을 입력 \n\n review_id : 이미지를 생성할 Review의 id (PK) 값을 입력 \n\n file : 원하는 이미지를 업로드"
+    ),
+)
 async def create_image(
     bucketlist_id: int = None,
     review_id: int = None,

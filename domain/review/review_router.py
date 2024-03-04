@@ -39,7 +39,7 @@ async def review_detail(review_id: int, db: Session = Depends(get_async_db)):
     tags=(["Review"]),
     summary=("리뷰 생성"),
     description=(
-        "title : 제목 \n\n content : 내용 \n\n review_image : 넣을 이미지 URL \n\n completed_at : 버킷리스트 완료 날짜 ('0000-00-00' 형태로 입력)"
+        "title : 제목 \n\n content : 내용 \n\n completed_at : 버킷리스트 완료 날짜 ('0000-00-00' 형태로 입력)"
     ),
 )
 async def review_create(
@@ -63,7 +63,7 @@ async def review_create(
     tags=(["Review"]),
     summary=("리뷰 수정"),
     description=(
-        "title : 제목 \n\n content : 내용 \n\n review_image : 넣을 이미지 URL \n\n completed_at : 버킷리스트 완료 날짜 ('0000-00-00' 형태로 입력) \n\n review_id : 수정하고싶은 Review의 id (PK) 값을 입력"
+        "title : 제목 \n\n content : 내용 \n\n completed_at : 버킷리스트 완료 날짜 ('0000-00-00' 형태로 입력) \n\n review_id : 수정하고싶은 Review의 id (PK) 값을 입력"
     ),
 )
 async def review_update(

@@ -61,7 +61,7 @@ async def bucketlist_detail(bucketlist_id: int, db: Session = Depends(get_async_
     tags=(["BucketList"]),
     summary=("버킷리스트 생성"),
     description=(
-        "title : 제목 \n\n content : 내용 \n\n bucket_image : 넣을 이미지 URL \n\n category : [음식점, 카페, 체험, 액티비티, 여행, 쇼핑, 운동, 게임, 영화, 기타] 중 선택 \n\n calender : 버킷리스트 예정일 ('0000-00-00' 형태로 입력)"
+        "title : 제목 \n\n content : 내용 \n\n category : [음식점, 카페, 체험, 액티비티, 여행, 쇼핑, 운동, 게임, 영화, 기타] 중 선택 \n\n calender : 버킷리스트 예정일 ('0000-00-00' 형태로 입력)"
     ),
 )
 async def bucketlist_create(
@@ -81,7 +81,7 @@ async def bucketlist_create(
     tags=(["BucketList"]),
     summary=("버킷리스트 수정"),
     description=(
-        "title : 제목 \n\n content : 내용 \n\n bucket_image : 넣을 이미지 URL \n\n category : [음식점, 카페, 체험, 액티비티, 여행, 쇼핑, 운동, 게임, 영화, 기타] 중 선택 \n\n calender : '0000-00-00' 형태로 입력 \n\n bucketlist_id : 수정하고싶은 BucketList의 id (PK) 값을 입력"
+        "title : 제목 \n\n content : 내용 \n\n category : [음식점, 카페, 체험, 액티비티, 여행, 쇼핑, 운동, 게임, 영화, 기타] 중 선택 \n\n calender : '0000-00-00' 형태로 입력 \n\n bucketlist_id : 수정하고싶은 BucketList의 id (PK) 값을 입력"
     ),
 )
 async def bucketlist_update(
