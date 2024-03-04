@@ -57,6 +57,17 @@ class BucketList(Base):
     # 외래키
     user_id = Column(Integer, ForeignKey("user.id"), nullable=False)
     user = relationship("User", backref="bucketlist_users")
+    # Cascade 설정
+    reviews = relationship(
+        "Review",
+        backref="bucketlist",
+        cascade="all, delete-orphan",
+    )
+    images = relationship(
+        "Image",
+        backref="bucketlist",
+        cascade="all, delete-orphan",
+    )
 
 
 # 리뷰 게시글
@@ -74,7 +85,12 @@ class Review(Base):
     user = relationship("User", backref="review_users")
     # bucketlist 외래키
     bucketlist_id = Column(Integer, ForeignKey("bucketlist.id"), nullable=False)
-    bucketlist = relationship("BucketList", backref="reviews")
+    # Cascade 설정
+    images = relationship(
+        "Image",
+        backref="review",
+        cascade="all, delete-orphan",
+    )
 
 
 # 버킷리스트 / 리뷰 이미지
@@ -86,8 +102,6 @@ class Image(Base):
 
     # bucketlist 외래키
     bucketlist_id = Column(Integer, ForeignKey("bucketlist.id"), nullable=True)
-    bucketlist = relationship("BucketList", backref="bucket_image")
 
     # review 외래키
     review_id = Column(Integer, ForeignKey("review.id"), nullable=True)
-    review = relationship("Review", backref="review_image")

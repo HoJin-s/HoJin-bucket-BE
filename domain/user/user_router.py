@@ -60,6 +60,7 @@ async def user_create(
             status_code=status.HTTP_409_CONFLICT, detail="이미 존재하는 사용자입니다."
         )
     await user_crud.create_user(db=db, user_create=_user_create)
+    return {"status": "201", "success": "회원가입 완료"}
 
 
 # 로그인
