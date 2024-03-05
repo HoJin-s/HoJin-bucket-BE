@@ -6,7 +6,7 @@ from domain.image import image_crud
 from models import BucketList, Image, Review, User
 from domain.user.user_router import get_current_user
 from starlette import status
-from domain.image.image_schema import ImageCreate
+from domain.image.image_schema import ImageCreate, ImageDelete
 import os
 import uuid
 from dotenv import load_dotenv
@@ -99,6 +99,46 @@ async def create_image(
         "bucketlist_id": bucketlist_id,
         "review_id": review_id,
     }
+
+
+# 이미지 삭제하기
+@router.delete(
+    "/delete",
+    status_code=status.HTTP_204_NO_CONTENT,
+    tags=(["Image"]),
+    summary=("이미지 삭제"),
+    description=("image_id : 이미지를 삭제할 Image의 id (PK) 값을 입력"),
+)
+async def delete_image(
+    _image_delete: ImageDelete,
+    db: Session = Depends(get_async_db),
+    current_user: User = Depends(get_current_user),
+):
+    db_image = await db.get(Image, _image_delete.image_id)
+    if not db_image:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="해당 이미지를 찾을 수 없습니다.",
+        )
+    else:
+        bucketlist = await db.get(BucketList, db_image.bucketlist_id)
+        review = await db.get(Review, db_image.review_id)
+        if bucketlist is not None:
+            if current_user.id != bucketlist.user_id:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="삭제 권한이 없습니다.",
+                )
+        if review is not None:
+            if current_user.id != review.user_id:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="삭제 권한이 없습니다.",
+                )
+
+    await image_crud.delete_image(db=db, db_image=db_image)
+
+    return {"status": "204", "success": "이미지 삭제완료"}
 
 
 # 이미지가 DB에서 삭제될 때, 해당 이미지 파일을 sqlalchemy의 event.listen으로 삭제하는 함수
