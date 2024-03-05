@@ -3,7 +3,8 @@ from sqlalchemy.orm import Session
 from sqlalchemy import event
 from database import get_async_db
 from domain.image import image_crud
-from models import BucketList, Image, Review
+from models import BucketList, Image, Review, User
+from domain.user.user_router import get_current_user
 from starlette import status
 from domain.image.image_schema import ImageCreate
 import os
@@ -36,6 +37,7 @@ async def create_image(
     review_id: int = None,
     file: UploadFile = File(...),
     db: Session = Depends(get_async_db),
+    current_user: User = Depends(get_current_user),
 ):
 
     if not os.path.exists(UPLOAD_DIR):
@@ -54,6 +56,10 @@ async def create_image(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="해당 버킷리스트를 찾을 수 없습니다.",
             )
+        if current_user.id != bucketlist.user_id:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="생성 권한이 없습니다."
+            )
 
     if review_id is not None:
         # review_id가 유효한지 확인
@@ -62,6 +68,10 @@ async def create_image(
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="해당 리뷰를 찾을 수 없습니다.",
+            )
+        if current_user.id != review.user_id:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="생성 권한이 없습니다."
             )
 
     if bucketlist_id is None and review_id is None:
