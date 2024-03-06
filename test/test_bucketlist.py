@@ -55,19 +55,23 @@ async def test_read_bucketlist_with_one_bucketlist(
 # bucketlist 15개 GET 테스트
 @pytest.mark.asyncio
 async def test_read_bucketlist_with_fifteen_bucketlist(
-    fifteen_test_bucketlist: Sequence[BucketList],
+    fifteen_test_bucketlist: Sequence[BucketList], one_test_user: User
 ) -> None:
     """
     비동기로 글 15개를 생성할 때, DB에 저장되는 순서가 가끔 바뀐다.
     (테스트코드 실행 시 아래의 print로 확인가능)
     """
     response = client.get("/api/bucketlist/list")
-
-    for i in range(len(response.json()["bucketlist_list"])):
-        print(response.json()["bucketlist_list"][i]["title"])
-
     assert response.status_code == status.HTTP_200_OK
     assert "total" in response.json()
     assert "bucketlist_list" in response.json()
     assert response.json()["total"] == 15  # 총 게시글 15개
     assert len(response.json()["bucketlist_list"]) == 10  # 1 페이지게시글 10개
+
+    for i in range(len(response.json()["bucketlist_list"])):
+        print(response.json()["bucketlist_list"][i]["title"])
+
+        assert (
+            response.json()["bucketlist_list"][i]["user"]["email"]
+            == one_test_user.email
+        )
