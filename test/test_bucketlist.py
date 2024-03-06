@@ -75,3 +75,38 @@ async def test_read_bucketlist_with_fifteen_bucketlist(
             response.json()["bucketlist_list"][i]["user"]["email"]
             == one_test_user.email
         )
+
+
+# bucketlist 15개 GET 테스트 (2페이지)
+@pytest.mark.asyncio
+async def test_read_bucketlist_with_fifteen_bucketlist_second_page(
+    fifteen_test_bucketlist: Sequence[BucketList],
+) -> None:
+    page = 1
+    size = 10
+    keyword = ""
+    response = client.get(
+        f"/api/bucketlist/list?page={page}&size={size}&keyword={keyword}"
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+    assert "total" in response.json()
+    assert "bucketlist_list" in response.json()
+    assert response.json()["total"] == 15  # 총 게시글 15개
+    assert len(response.json()["bucketlist_list"]) == 5  # 2 페이지게시글 5개
+
+
+# bucketlist 15개 GET 테스트 (keyword 검색)
+@pytest.mark.asyncio
+async def test_read_bucketlist_with_fifteen_bucketlist_search(
+    fifteen_test_bucketlist: Sequence[BucketList],
+) -> None:
+    keyword = "7"  # 7검색
+    response = client.get(f"/api/bucketlist/list?&keyword={keyword}")
+
+    assert response.status_code == status.HTTP_200_OK
+    assert "total" in response.json()
+    assert "bucketlist_list" in response.json()
+    assert response.json()["total"] == 1  # 검색 결과 1개
+    assert len(response.json()["bucketlist_list"]) == 1
+
