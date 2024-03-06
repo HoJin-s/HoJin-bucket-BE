@@ -110,3 +110,29 @@ async def test_read_bucketlist_with_fifteen_bucketlist_search(
     assert response.json()["total"] == 1  # 검색 결과 1개
     assert len(response.json()["bucketlist_list"]) == 1
 
+
+# 특정 bucketlist GET 성공
+@pytest.mark.asyncio
+async def test_read_bucketlist_detail(
+    one_test_bucketlist: BucketList, one_test_user: User
+) -> None:
+    response = client.get(f"/api/bucketlist/detail/{one_test_bucketlist.id}")
+
+    assert response.status_code == status.HTTP_200_OK
+    assert response.json()["id"] == 1
+    assert response.json()["title"] == one_test_bucketlist.title
+    assert response.json()["content"] == one_test_bucketlist.content
+    assert response.json()["updated_at"] == one_test_bucketlist.updated_at
+    assert response.json()["category"] == one_test_bucketlist.category
+    assert response.json()["is_done"] == one_test_bucketlist.is_done
+    assert response.json()["user"]["id"] == one_test_user.id
+    assert response.json()["user"]["email"] == one_test_user.email
+    assert response.json()["user"]["username"] == one_test_user.username
+
+
+# 특정 bucketlist GET 실패
+@pytest.mark.asyncio
+async def test_read_bucketlist_detail(one_test_bucketlist: BucketList) -> None:
+    response = client.get(f"/api/bucketlist/detail/{one_test_bucketlist.id + 1}")
+
+    assert response.status_code == status.HTTP_404_NOT_FOUND
