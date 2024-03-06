@@ -1,12 +1,9 @@
 from typing import Sequence
 import pytest
 from fastapi.testclient import TestClient
-from fastapi import status, Depends
-from sqlalchemy import select
+from fastapi import status
 from models import User, BucketList, Review
 from main import app
-from sqlalchemy.ext.asyncio import AsyncSession
-from database import get_async_db
 
 client = TestClient(app)
 
@@ -113,7 +110,7 @@ async def test_read_bucketlist_with_fifteen_bucketlist_search(
 
 # 특정 bucketlist GET 성공
 @pytest.mark.asyncio
-async def test_read_bucketlist_detail(
+async def test_read_bucketlist_detail_success(
     one_test_bucketlist: BucketList, one_test_user: User
 ) -> None:
     response = client.get(f"/api/bucketlist/detail/{one_test_bucketlist.id}")
@@ -132,7 +129,122 @@ async def test_read_bucketlist_detail(
 
 # 특정 bucketlist GET 실패
 @pytest.mark.asyncio
-async def test_read_bucketlist_detail(one_test_bucketlist: BucketList) -> None:
+async def test_read_bucketlist_detail_failure(one_test_bucketlist: BucketList) -> None:
     response = client.get(f"/api/bucketlist/detail/{one_test_bucketlist.id + 1}")
 
     assert response.status_code == status.HTTP_404_NOT_FOUND
+
+
+# bucketlist 생성 POST
+@pytest.mark.asyncio
+async def test_create_bucketlist(test_login_and_get_token) -> None:
+
+    response = client.post(
+        url="/api/bucketlist/create",
+        headers={"Authorization": f"Bearer {test_login_and_get_token}"},
+        json={
+            "title": "test_bucketlist_create_title",
+            "content": "test_bucketlist_create_content",
+            "category": "액티비티",
+            "calender": "2024-03-06",
+        },
+    )
+    assert response.status_code == status.HTTP_201_CREATED
+    assert response.json()["status"] == "201"
+    assert response.json()["success"] == "버킷리스트 생성완료"
+
+
+# bucketlist 생성 POST (Token 미입력/미일치)
+@pytest.mark.asyncio
+async def test_create_bucketlist_unauthorized(test_login_and_get_token) -> None:
+
+    response = client.post(
+        url="/api/bucketlist/create",
+        headers={"Authorization": f"Bearer wrong{test_login_and_get_token}"},
+        json={
+            "title": "test_bucketlist_create_title",
+            "content": "test_bucketlist_create_content",
+            "category": "액티비티",
+            "calender": "2024-03-06",
+        },
+    )
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+
+# bucketlist 생성 POST (title 미입력시)
+@pytest.mark.asyncio
+async def test_create_bucketlist_with_blank_title(test_login_and_get_token) -> None:
+
+    response = client.post(
+        url="/api/bucketlist/create",
+        headers={"Authorization": f"Bearer {test_login_and_get_token}"},
+        json={
+            "title": "",
+            "content": "test_bucketlist_create_content",
+            "category": "액티비티",
+            "calender": "2024-03-06",
+        },
+    )
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert (
+        response.json()["detail"][0]["msg"] == "Value error, 빈 값은 허용되지 않습니다."
+    )
+
+
+# bucketlist 생성 POST (title 미입력시)
+@pytest.mark.asyncio
+async def test_create_bucketlist_with_no_title(test_login_and_get_token) -> None:
+
+    response = client.post(
+        url="/api/bucketlist/create",
+        headers={"Authorization": f"Bearer {test_login_and_get_token}"},
+        json={
+            "content": "test_bucketlist_create_content",
+            "category": "액티비티",
+            "calender": "2024-03-06",
+        },
+    )
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert response.json()["detail"][0]["msg"] == "Field required"
+
+
+# bucketlist 생성 POST (부적절한 카테고리 입력)
+@pytest.mark.asyncio
+async def test_create_bucketlist_with_wrong_category(test_login_and_get_token) -> None:
+
+    response = client.post(
+        url="/api/bucketlist/create",
+        headers={"Authorization": f"Bearer {test_login_and_get_token}"},
+        json={
+            "title": "test_bucketlist_create_title",
+            "category": "없는 카테고리",
+        },
+    )
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert (
+        response.json()["detail"][0]["msg"]
+        == "Input should be '음식점', '카페', '체험', '액티비티', '여행', '쇼핑', '운동', '게임', '영화' or '기타'"
+    )
+
+
+# bucketlist 생성 POST (부적절한 날짜 입력)
+@pytest.mark.asyncio
+async def test_create_bucketlist_with_wrong_calender(test_login_and_get_token) -> None:
+
+    response = client.post(
+        url="/api/bucketlist/create",
+        headers={"Authorization": f"Bearer {test_login_and_get_token}"},
+        json={
+            "title": "test_bucketlist_create_title",
+            "calender": "2024-03-33",
+        },
+    )
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert (
+        response.json()["detail"][0]["msg"]
+        == "Input should be a valid date or datetime, day value is outside expected range"
+    )
+    assert (
+        response.json()["detail"][0]["ctx"]["error"]
+        == "day value is outside expected range"
+    )

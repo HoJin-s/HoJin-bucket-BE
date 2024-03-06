@@ -122,3 +122,21 @@ async def fifteen_test_bucketlist(
     test_session.add_all(test_bucketlists)
     await test_session.commit()
     return test_bucketlists
+
+
+from fastapi import status
+
+
+# 토큰 로그인 (GET token)
+@pytest_asyncio.fixture
+async def test_login_and_get_token(client: TestClient, one_test_user: User) -> str:
+    response = client.post(
+        "/api/user/login",
+        data={
+            "username": one_test_user.username,
+            "password": "one_test_user",
+        },
+    )
+    assert response.status_code == status.HTTP_200_OK
+    token = response.json()["access_token"]
+    return token
