@@ -90,18 +90,18 @@ async def review_update(
 
 # 리뷰 삭제
 @router.delete(
-    "/delete",
+    "/delete/{review_id}",
     status_code=status.HTTP_204_NO_CONTENT,
     tags=(["Review"]),
     summary=("리뷰 삭제"),
     description=("review_id : 삭제하고싶은 Review의 id (PK) 값을 입력"),
 )
 async def review_delete(
-    _review_delete: review_schema.ReviewDelete,
+    review_id: int,
     db: Session = Depends(get_async_db),
     current_user: User = Depends(get_current_user),
 ):
-    db_review = await review_crud.get_review(db, review_id=_review_delete.review_id)
+    db_review = await review_crud.get_review(db, review_id=review_id)
     if not db_review:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -112,4 +112,3 @@ async def review_delete(
             status_code=status.HTTP_400_BAD_REQUEST, detail="삭제 권한이 없습니다."
         )
     await review_crud.delete_review(db=db, db_review=db_review)
-    return {"status": "204", "success": "리뷰 삭제완료"}

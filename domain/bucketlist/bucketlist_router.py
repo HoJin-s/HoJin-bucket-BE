@@ -134,5 +134,3 @@ async def bucketlist_delete(
             status_code=status.HTTP_400_BAD_REQUEST, detail="삭제 권한이 없습니다."
         )
     await bucketlist_crud.delete_bucketlist(db=db, db_bucketlist=db_bucketlist)
-
-    return {"status": "204", "success": "버킷리스트 삭제완료"}
