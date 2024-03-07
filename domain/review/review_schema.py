@@ -40,8 +40,3 @@ class ReviewCreate(BaseModel):
 # 리뷰 수정
 class ReviewUpdate(ReviewCreate):
     review_id: int
-
-
-# 리뷰 삭제
-class ReviewDelete(BaseModel):
-    review_id: int

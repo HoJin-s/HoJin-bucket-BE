@@ -49,7 +49,7 @@ async def get_bucketlist_list(
                 | sub_query.c.username.ilike(search)  # 리뷰 작성자
             )
         )
-    total = await db.execute(select(func.count()).select_from(query))
+    total = await db.execute(select(func.count()).select_from(query.subquery()))
     bucketlist_list = await db.execute(
         query.order_by(BucketList.created_at.desc())
         .offset(skip)

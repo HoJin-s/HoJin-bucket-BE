@@ -6,7 +6,7 @@ from domain.image import image_crud
 from models import BucketList, Image, Review, User
 from domain.user.user_router import get_current_user
 from starlette import status
-from domain.image.image_schema import ImageCreate, ImageDelete
+from domain.image import image_schema
 import os
 import uuid
 from dotenv import load_dotenv
@@ -21,11 +21,32 @@ router = APIRouter(
 UPLOAD_DIR = "./image_file"
 
 
+# 특정 이미지 가져오기
+@router.get(
+    "/detail/{image_id}",
+    response_model=image_schema.Image,
+    tags=(["Image"]),
+    summary=("특정 이미지 가져오기"),
+    description=("image_id : 가져오고싶은 Image의 id (PK) 값을 입력"),
+)
+async def image_detail(
+    image_id: int,
+    db: Session = Depends(get_async_db),
+):
+    image = await image_crud.get_image(db, image_id=image_id)
+    if not image:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="해당 이미지를 찾을 수 없습니다.",
+        )
+    return image
+
+
 # 이미지 생성하기
 @router.post(
     "/create",
     status_code=status.HTTP_201_CREATED,
-    response_model=ImageCreate,
+    response_model=image_schema.ImageCreate,
     tags=(["Image"]),
     summary=("이미지 생성"),
     description=(
@@ -39,7 +60,6 @@ async def create_image(
     db: Session = Depends(get_async_db),
     current_user: User = Depends(get_current_user),
 ):
-
     if not os.path.exists(UPLOAD_DIR):
         os.makedirs(UPLOAD_DIR)
 
@@ -103,18 +123,18 @@ async def create_image(
 
 # 이미지 삭제하기
 @router.delete(
-    "/delete",
+    "/delete/{image_id}",
     status_code=status.HTTP_204_NO_CONTENT,
     tags=(["Image"]),
     summary=("이미지 삭제"),
     description=("image_id : 이미지를 삭제할 Image의 id (PK) 값을 입력"),
 )
 async def delete_image(
-    _image_delete: ImageDelete,
+    image_id=int,
     db: Session = Depends(get_async_db),
     current_user: User = Depends(get_current_user),
 ):
-    db_image = await db.get(Image, _image_delete.image_id)
+    db_image = await db.get(Image, image_id)
     if not db_image:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -137,8 +157,6 @@ async def delete_image(
                 )
 
     await image_crud.delete_image(db=db, db_image=db_image)
-
-    return {"status": "204", "success": "이미지 삭제완료"}
 
 
 # 이미지가 DB에서 삭제될 때, 해당 이미지 파일을 sqlalchemy의 event.listen으로 삭제하는 함수
