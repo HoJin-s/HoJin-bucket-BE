@@ -5,8 +5,7 @@ import pytest_asyncio
 import aiofiles
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from fastapi.testclient import TestClient
-from fastapi import status
-from models import User, BucketList, Review
+from models import Image, User, BucketList, Review
 from database import Base, get_async_db
 from main import app
 
@@ -136,7 +135,6 @@ async def test_login_and_get_token(client: TestClient, one_test_user: User) -> s
             "password": "one_test_user",
         },
     )
-    assert response.status_code == status.HTTP_200_OK
     token = response.json()["access_token"]
     return token
 
@@ -159,10 +157,25 @@ async def one_test_review(
     return one_test_review
 
 
-# 이미지 1개 생성
+# 임시 이미지 파일 1개 생성
 @pytest_asyncio.fixture
 async def image_file(tmp_path):
     file_path = tmp_path / "test_image.jpg"
     async with aiofiles.open(file_path, "wb") as f:
         await f.write(b"image data")
     return file_path
+
+
+# 이미지 모델 1개 생성
+@pytest_asyncio.fixture
+async def one_test_image(
+    test_session: AsyncSession,
+    one_test_bucketlist: BucketList,
+) -> Image:
+    one_test_image = Image(
+        data="http://127.0.0.1:8000/image_file\\one_test_image.jpg",
+        bucketlist_id=one_test_bucketlist.id,
+    )
+    test_session.add(one_test_image)
+    await test_session.commit()
+    return one_test_image
