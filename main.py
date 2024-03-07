@@ -1,19 +1,16 @@
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.cors import CORSMiddleware
-
 from domain.bucketlist import bucketlist_router
 from domain.user import user_router
 from domain.review import review_router
 from domain.image import image_router
-from dotenv import load_dotenv
-
 import os
+from settings import get_be_url, get_fe_url, get_upload_dir
 
-load_dotenv(override=True)
-BE_URL = os.getenv("BE_URL")
-FE_URL = os.getenv("FE_URL")
-UPLOAD_DIR = "./image_file"
+BE_URL = get_be_url()
+FE_URL = get_fe_url()
+UPLOAD_DIR = get_upload_dir()
 
 app = FastAPI()
 
@@ -36,4 +33,6 @@ app.include_router(review_router.router)
 app.include_router(image_router.router)
 
 if os.path.exists(UPLOAD_DIR):
-    app.mount("/image_file", StaticFiles(directory="./image_file"), name="image_files")
+    app.mount(
+        UPLOAD_DIR[1:], StaticFiles(directory=UPLOAD_DIR), name=f"{UPLOAD_DIR[2:]}s"
+    )

@@ -9,14 +9,12 @@ from models import User
 from main import app
 from datetime import timedelta, datetime
 from jose import jwt
-from dotenv import load_dotenv
-import os
+from settings import get_access_token_expire_minutes, get_secret_key, get_algorithm
 
 # 로그인 테스트 시, 사용
-load_dotenv(override=True)
-ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))
-SECRET_KEY = os.getenv("SECRET_KEY")
-ALGORITHM = os.getenv("ALGORITHM")
+ACCESS_TOKEN_EXPIRE_MINUTES = get_access_token_expire_minutes()
+SECRET_KEY = get_secret_key()
+ALGORITHM = get_algorithm()
 
 client = TestClient(app)
 
