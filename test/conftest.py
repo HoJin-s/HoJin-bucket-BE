@@ -2,8 +2,10 @@ from typing import AsyncGenerator, Sequence
 from datetime import datetime
 from passlib.context import CryptContext
 import pytest_asyncio
+import aiofiles
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from fastapi.testclient import TestClient
+from fastapi import status
 from models import User, BucketList, Review
 from database import Base, get_async_db
 from main import app
@@ -33,10 +35,10 @@ async def test_session() -> AsyncGenerator[AsyncSession, None]:
 async def create_tables() -> AsyncGenerator[None, None]:
     """테스트 전 테이블 create / 테스트 후 테이블 drop"""
     async with async_engine.begin() as conn:
+        await conn.run_sync(Base.metadata.drop_all)
+    async with async_engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
     yield
-    async with async_engine.begin() as conn:
-        await conn.run_sync(Base.metadata.drop_all)
 
 
 @pytest_asyncio.fixture(autouse=True)
@@ -124,9 +126,6 @@ async def fifteen_test_bucketlist(
     return test_bucketlists
 
 
-from fastapi import status
-
-
 # 토큰 로그인 (GET token)
 @pytest_asyncio.fixture
 async def test_login_and_get_token(client: TestClient, one_test_user: User) -> str:
@@ -158,3 +157,12 @@ async def one_test_review(
     test_session.add(one_test_review)
     await test_session.commit()
     return one_test_review
+
+
+# 이미지 1개 생성
+@pytest_asyncio.fixture
+async def image_file(tmp_path):
+    file_path = tmp_path / "test_image.jpg"
+    async with aiofiles.open(file_path, "wb") as f:
+        await f.write(b"image data")
+    return file_path
