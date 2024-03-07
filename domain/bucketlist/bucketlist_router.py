@@ -110,19 +110,19 @@ async def bucketlist_update(
 
 # 버킷리스트 삭제
 @router.delete(
-    "/delete",
+    "/delete/{bucketlist_id}",
     status_code=status.HTTP_204_NO_CONTENT,
     tags=(["BucketList"]),
     summary=("버킷리스트 삭제"),
     description=("bucketlist_id : 삭제하고싶은 BucketList의 id (PK) 값을 입력"),
 )
 async def bucketlist_delete(
-    _bucketlist_delete: bucketlist_schema.BucketListDelete,
+    bucketlist_id: int,
     db: Session = Depends(get_async_db),
     current_user: User = Depends(get_current_user),
 ):
     db_bucketlist = await bucketlist_crud.get_bucketlist(
-        db, bucketlist_id=_bucketlist_delete.bucketlist_id
+        db, bucketlist_id=bucketlist_id
     )
     if not db_bucketlist:
         raise HTTPException(
