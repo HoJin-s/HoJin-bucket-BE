@@ -1,5 +1,12 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 from models import Image
+from sqlalchemy import select
+
+
+# 특정 이미지 가져오기
+async def get_image(db: Session, image_id: int):
+    review = await db.execute(select(Image).filter(Image.id == image_id))
+    return review.scalar_one_or_none()
 
 
 # 이미지 생성하기
