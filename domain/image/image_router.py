@@ -9,16 +9,14 @@ from starlette import status
 from domain.image import image_schema
 import os
 import uuid
-from dotenv import load_dotenv
+from settings import get_be_url, get_upload_dir
 
-load_dotenv(override=True)
-BE_URL = os.getenv("BE_URL")
+BE_URL = get_be_url()
+UPLOAD_DIR = get_upload_dir()
 
 router = APIRouter(
     prefix="/api/image",
 )
-
-UPLOAD_DIR = "./image_file"
 
 
 # 특정 이미지 가져오기
@@ -66,7 +64,7 @@ async def create_image(
     content = await file.read()
     filename = f"{str(uuid.uuid4())}.jpg"  # uuid로 유니크한 파일명으로 변경
     file_path = os.path.join(UPLOAD_DIR, filename)
-    file_url = f"{BE_URL}/image_file\\{filename}"
+    file_url = f"{BE_URL}/{UPLOAD_DIR[2:]}\\{filename}"
 
     if bucketlist_id is not None:
         # bucketlist_id가 유효한지 확인

@@ -1,13 +1,10 @@
 from sqlalchemy import create_engine, MetaData
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from sqlalchemy.orm import sessionmaker, declarative_base
-from dotenv import load_dotenv
-import os
-
-load_dotenv(override=True)
+from settings import get_sqlalchemy_database_url, get_sqlalchemy_database_url_async
 
 # 동기
-SQLALCHEMY_DATABASE_URL = os.getenv("SQLALCHEMY_DATABASE_URL")
+SQLALCHEMY_DATABASE_URL = get_sqlalchemy_database_url()
 if SQLALCHEMY_DATABASE_URL.startswith("sqlite"):
     engine = create_engine(
         SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
@@ -17,7 +14,7 @@ else:
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 # 비동기
-SQLALCHEMY_DATABASE_URL_ASYNC = os.getenv("SQLALCHEMY_DATABASE_URL_ASYNC")
+SQLALCHEMY_DATABASE_URL_ASYNC = get_sqlalchemy_database_url_async()
 async_engine = create_async_engine(SQLALCHEMY_DATABASE_URL_ASYNC, echo=False)
 AsyncSessionLocal = async_sessionmaker(
     bind=async_engine, autocommit=False, class_=AsyncSession, expire_on_commit=False

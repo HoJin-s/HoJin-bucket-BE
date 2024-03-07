@@ -10,16 +10,12 @@ from starlette import status
 from database import get_db, get_async_db
 from domain.user import user_crud, user_schema
 from domain.user.user_crud import pwd_context
-
-from dotenv import load_dotenv
-import os
-
 from models import User
+from settings import get_access_token_expire_minutes, get_secret_key, get_algorithm
 
-load_dotenv(override=True)
-ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))
-SECRET_KEY = os.getenv("SECRET_KEY")
-ALGORITHM = os.getenv("ALGORITHM")
+ACCESS_TOKEN_EXPIRE_MINUTES = get_access_token_expire_minutes()
+SECRET_KEY = get_secret_key()
+ALGORITHM = get_algorithm()
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/user/login")
 
