@@ -140,3 +140,21 @@ async def test_login_and_get_token(client: TestClient, one_test_user: User) -> s
     assert response.status_code == status.HTTP_200_OK
     token = response.json()["access_token"]
     return token
+
+
+# 리뷰 1개 생성
+@pytest_asyncio.fixture
+async def one_test_review(
+    one_test_user: User, one_test_bucketlist: BucketList, test_session: AsyncSession
+) -> Review:
+
+    one_test_review = Review(
+        title="one_test_review_title",
+        content="one_test_review_content",
+        created_at=datetime.now(),
+        user=one_test_user,
+        bucketlist=one_test_bucketlist,
+    )
+    test_session.add(one_test_review)
+    await test_session.commit()
+    return one_test_review
