@@ -295,3 +295,43 @@ async def test_update_bucketlist_wrong_bucketlist_id(
     )
     assert response.status_code == status.HTTP_400_BAD_REQUEST
     assert response.json()["detail"] == "해당 게시글을 찾을 수 없습니다."
+
+
+# bucketlist 삭제 DELETE 성공
+@pytest.mark.asyncio
+async def test_delete_bucketlist(
+    one_test_bucketlist: BucketList,
+    test_login_and_get_token,
+) -> None:
+    response = client.delete(
+        url=f"/api/bucketlist/delete/{one_test_bucketlist.id}",
+        headers={"Authorization": f"Bearer {test_login_and_get_token}"},
+    )
+    assert response.status_code == status.HTTP_204_NO_CONTENT
+
+
+# bucketlist 삭제 DELETE 실패 (없는 bucketlist_id)
+@pytest.mark.asyncio
+async def test_delete_bucketlist_wrong_bucketlist_id(
+    one_test_bucketlist: BucketList,
+    test_login_and_get_token,
+) -> None:
+    response = client.delete(
+        url=f"/api/bucketlist/delete/{one_test_bucketlist.id + 1}",
+        headers={"Authorization": f"Bearer {test_login_and_get_token}"},
+    )
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.json()["detail"] == "해당 게시글을 찾을 수 없습니다."
+
+
+# bucketlist 삭제 DELETE 실패 (Token 미입력/미일치)
+@pytest.mark.asyncio
+async def test_delete_bucketlist_unauthorized(
+    one_test_bucketlist: BucketList,
+    test_login_and_get_token,
+) -> None:
+    response = client.delete(
+        url=f"/api/bucketlist/delete/{one_test_bucketlist.id}",
+        headers={"Authorization": f"Bearer wrong{test_login_and_get_token}"},
+    )
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
