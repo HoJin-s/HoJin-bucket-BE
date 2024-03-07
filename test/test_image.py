@@ -177,7 +177,6 @@ async def test_delete_image(
     test_login_and_get_token,
     one_test_image: Image,
 ) -> None:
-    print(one_test_image)
     response = client.delete(
         url=f"/api/image/delete/{one_test_image.id}",
         headers={"Authorization": f"Bearer {test_login_and_get_token}"},
@@ -191,7 +190,6 @@ async def test_delete_image_wrong_image_id(
     test_login_and_get_token,
     one_test_image: Image,
 ) -> None:
-    print(one_test_image)
     response = client.delete(
         url=f"/api/image/delete/{one_test_image.id + 1}",
         headers={"Authorization": f"Bearer {test_login_and_get_token}"},
@@ -206,7 +204,6 @@ async def test_delete_image_unauthorized(
     test_login_and_get_token,
     one_test_image: Image,
 ) -> None:
-    print(one_test_image)
     response = client.delete(
         url=f"/api/image/delete/{one_test_image.id}",
         headers={"Authorization": f"Bearer wrong_{test_login_and_get_token}"},
