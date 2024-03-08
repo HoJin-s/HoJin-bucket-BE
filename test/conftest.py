@@ -68,7 +68,7 @@ async def override_upload_dir(monkeypatch):
     yield UPLOAD_DIR_TEST
 
 
-@pytest_asyncio.fixture(scope="module")
+@pytest_asyncio.fixture
 async def delete_upload_dir():
     if os.path.exists(UPLOAD_DIR_TEST):
         shutil.rmtree(UPLOAD_DIR_TEST)
