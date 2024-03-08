@@ -83,7 +83,9 @@ async def create_bucketlist(
     existing_bucketlist_title = await db.execute(
         select(BucketList).filter_by(title=bucketlist_create.title)
     )
-    if existing_bucketlist_title:
+    existing_bucketlist = existing_bucketlist_title.fetchone()
+
+    if existing_bucketlist:
         raise HTTPException(
             status_code=status.HTTP_406_NOT_ACCEPTABLE,
             detail="입력한 제목이 이미 존재합니다.",
