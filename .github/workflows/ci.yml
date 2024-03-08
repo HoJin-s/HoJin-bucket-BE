@@ -1,8 +1,14 @@
 name: Run tests
 
 on:
-  push:
-    branches: [main]
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: "Log level"
+        required: true
+        default: "warning"
+      tags:
+        description: "Test scenario tags"
 
 jobs:
   execute_tests:
@@ -23,4 +29,5 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Run Test
-        run: pytest -v
+        run: |
+          pytest -v
