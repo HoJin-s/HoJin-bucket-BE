@@ -138,21 +138,20 @@ async def delete_image(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="해당 이미지를 찾을 수 없습니다.",
         )
-    else:
+    if db_image.bucketlist_id is not None:
         bucketlist = await db.get(BucketList, db_image.bucketlist_id)
+        if current_user.id != bucketlist.user_id:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="삭제 권한이 없습니다.",
+            )
+    if db_image.review_id is not None:
         review = await db.get(Review, db_image.review_id)
-        if bucketlist is not None:
-            if current_user.id != bucketlist.user_id:
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="삭제 권한이 없습니다.",
-                )
-        if review is not None:
-            if current_user.id != review.user_id:
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="삭제 권한이 없습니다.",
-                )
+        if current_user.id != review.user_id:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="삭제 권한이 없습니다.",
+            )
 
     await image_crud.delete_image(db=db, db_image=db_image)
 
