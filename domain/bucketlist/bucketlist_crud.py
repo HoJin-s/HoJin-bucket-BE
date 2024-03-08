@@ -1,7 +1,7 @@
 from datetime import datetime
-
+from fastapi import HTTPException
 from domain.bucketlist.bucketlist_schema import BucketListCreate, BucketListUpdate
-
+from starlette import status
 from sqlalchemy import and_, select, func
 from models import BucketList, User, Review
 from sqlalchemy.orm import Session, selectinload
@@ -80,6 +80,17 @@ async def get_bucketlist(db: Session, bucketlist_id: int):
 async def create_bucketlist(
     db: Session, bucketlist_create: BucketListCreate, user: User
 ):
+    existing_bucketlist_title = await db.execute(
+        select(BucketList).filter_by(title=bucketlist_create.title)
+    )
+    existing_bucketlist = existing_bucketlist_title.fetchone()
+
+    if existing_bucketlist:
+        raise HTTPException(
+            status_code=status.HTTP_406_NOT_ACCEPTABLE,
+            detail="입력한 제목이 이미 존재합니다.",
+        )
+
     db_bucketlist = BucketList(
         title=bucketlist_create.title,
         content=bucketlist_create.content,

@@ -32,7 +32,16 @@ app.include_router(review_router.router)
 # 이미지파일 저장
 app.include_router(image_router.router)
 
+# 서버 디렉토리에 대한 StaticFiles 미들웨어 등록
 if os.path.exists(UPLOAD_DIR):
     app.mount(
         UPLOAD_DIR[1:], StaticFiles(directory=UPLOAD_DIR), name=f"{UPLOAD_DIR[2:]}s"
+    )
+
+# 테스트코드 디렉토리에 대한 StaticFiles 미들웨어 등록
+if os.path.exists("./image_file_test"):
+    app.mount(
+        "/image_file_test",
+        StaticFiles(directory="./image_file_test"),
+        name="image_files_test",
     )

@@ -6,6 +6,7 @@ hojin_project.db
 hojin_project_test.db
 migrations/versions/
 image_file/*
+image_file_test/*
 
 ### macOS ###
 # General
