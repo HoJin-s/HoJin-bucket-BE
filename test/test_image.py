@@ -7,6 +7,12 @@ from main import app
 client = TestClient(app)
 
 
+# 테스트 전 이미지 저장폴더 삭제
+@pytest.mark.asyncio
+async def test_delete_upload_dir(delete_upload_dir):
+    delete_upload_dir
+
+
 # 특정 이미지 GET 성공
 @pytest.mark.asyncio
 async def test_get_image(one_test_image: Image):
@@ -31,6 +37,7 @@ async def test_get_image_wrong_image_id(one_test_image: Image):
 
 # 이미지 생성 POST 성공 (bucketlist 이미지)
 @pytest.mark.asyncio
+@pytest.mark.usefixtures("override_upload_dir")
 async def test_create_image_with_bucketlst_id(
     test_login_and_get_token,
     one_test_bucketlist: BucketList,
@@ -51,6 +58,7 @@ async def test_create_image_with_bucketlst_id(
 
 # 이미지 생성 POST 성공 (review 이미지)
 @pytest.mark.asyncio
+@pytest.mark.usefixtures("override_upload_dir")
 async def test_create_image_with_review_id(
     test_login_and_get_token,
     one_test_review: Review,

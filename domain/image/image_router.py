@@ -11,9 +11,6 @@ import os
 import uuid
 from settings import get_be_url, get_upload_dir
 
-BE_URL = get_be_url()
-UPLOAD_DIR = get_upload_dir()
-
 router = APIRouter(
     prefix="/api/image",
 )
@@ -58,6 +55,9 @@ async def create_image(
     db: Session = Depends(get_async_db),
     current_user: User = Depends(get_current_user),
 ):
+    BE_URL = get_be_url()
+    UPLOAD_DIR = get_upload_dir()
+
     if not os.path.exists(UPLOAD_DIR):
         os.makedirs(UPLOAD_DIR)
 
@@ -160,6 +160,7 @@ async def delete_image(
 # 이미지가 DB에서 삭제될 때, 해당 이미지 파일을 sqlalchemy의 event.listen으로 삭제하는 함수
 # 이벤트 리스너는 동기적인 방식으로 동작하므로, 하나의 트랜젝션이라고 생각하여 동기방식으로 구현
 def delete_image_file(target):
+    UPLOAD_DIR = get_upload_dir()
     target_data = target.data.split("/")[3][11:]
     file_path = os.path.join(UPLOAD_DIR, target_data)
     if os.path.exists(file_path):

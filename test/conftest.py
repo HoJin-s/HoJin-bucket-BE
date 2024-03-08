@@ -8,7 +8,10 @@ from fastapi.testclient import TestClient
 from models import Image, User, BucketList, Review
 from database import Base, get_async_db
 from main import app
+import os
+import shutil
 
+UPLOAD_DIR_TEST = "./image_file_test"
 
 SQLALCHEMY_DATABASE_URL_ASYNC_TEST = "sqlite+aiosqlite:///hojin_project_test.db"
 async_engine = create_async_engine(SQLALCHEMY_DATABASE_URL_ASYNC_TEST, echo=False)
@@ -53,6 +56,22 @@ async def client(test_session):
     app.dependency_overrides[get_async_db] = override_get_async_db
 
     yield TestClient(app)
+
+
+@pytest_asyncio.fixture
+async def override_upload_dir(monkeypatch):
+    """UPLOAD_DIR를 ./image_file_test로 변경"""
+
+    monkeypatch.setenv("UPLOAD_DIR", str(UPLOAD_DIR_TEST))
+    if not os.path.exists(UPLOAD_DIR_TEST):
+        os.makedirs(UPLOAD_DIR_TEST)
+    yield UPLOAD_DIR_TEST
+
+
+@pytest_asyncio.fixture(scope="module")
+async def delete_upload_dir():
+    if os.path.exists(UPLOAD_DIR_TEST):
+        shutil.rmtree(UPLOAD_DIR_TEST)
 
 
 # 유저 1명 생성
