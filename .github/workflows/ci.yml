@@ -1,26 +1,26 @@
-name : Run tests
+name: Run tests
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   execute_tests:
     name: Install requirements and execute tests
     runs-on: ubuntu-latest
-    
+
     env:
       SECRET_KEY: ${{ secrets.SECRET_KEY }}
-      
+
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3
-        
+
       - name: Install pip
         run: sudo apt install python3-pip
-        
+
       - name: Install requirements
         run: pip install -r requirements.txt
-        
-      - name: Run Test 
+
+      - name: Run Test
         run: pytest -v
