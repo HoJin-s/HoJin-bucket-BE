@@ -29,6 +29,8 @@ outcome==1.3.0.post0
 packaging==23.2
 passlib==1.7.4
 pluggy==1.4.0
+psycopg2==2.9.9
+psycopg2-binary==2.9.9
 pyasn1==0.5.1
 pycparser==2.21
 pydantic==2.6.1
