@@ -14,6 +14,7 @@ import shutil
 UPLOAD_DIR_TEST = "./image_file_test"
 
 SQLALCHEMY_DATABASE_URL_ASYNC_TEST = "sqlite+aiosqlite:///hojin_project_test.db"
+
 async_engine = create_async_engine(SQLALCHEMY_DATABASE_URL_ASYNC_TEST, echo=False)
 TestingAsyncSessionLocal = async_sessionmaker(
     autocommit=False,

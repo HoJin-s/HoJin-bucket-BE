@@ -12,8 +12,11 @@ on:
 
 jobs:
   execute_tests:
-    name: Install requirements and execute tests
+    name: Install dependencies and execute tests
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.11.4]
 
     env:
       SECRET_KEY: ${{ secrets.SECRET_KEY }}
@@ -22,11 +25,15 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v3
 
-      - name: Install pip
-        run: sudo apt install python3-pip
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v3
+        with:
+          python-version: ${{ matrix.python-version }}
 
-      - name: Install requirements
-        run: pip install -r requirements.txt
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
 
       - name: Run Test
         run: |
