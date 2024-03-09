@@ -10,10 +10,12 @@ from database import Base, get_async_db
 from main import app
 import os
 import shutil
+from settings import get_sqlalchemy_database_url_async
 
 UPLOAD_DIR_TEST = "./image_file_test"
 
-SQLALCHEMY_DATABASE_URL_ASYNC_TEST = "sqlite+aiosqlite:///hojin_project_test.db"
+SQLALCHEMY_DATABASE_URL_ASYNC_TEST = get_sqlalchemy_database_url_async()
+
 async_engine = create_async_engine(SQLALCHEMY_DATABASE_URL_ASYNC_TEST, echo=False)
 TestingAsyncSessionLocal = async_sessionmaker(
     autocommit=False,
