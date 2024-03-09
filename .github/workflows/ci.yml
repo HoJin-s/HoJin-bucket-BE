@@ -16,10 +16,17 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.11.4]
+        python-version: ["3.11.4"]
 
     env:
+      ACCESS_TOKEN_EXPIRE_MINUTES: ${{ secrets.ACCESS_TOKEN_EXPIRE_MINUTES }}
       SECRET_KEY: ${{ secrets.SECRET_KEY }}
+      ALGORITHM: ${{ secrets.ALGORITHM }}
+      SQLALCHEMY_DATABASE_URL: ${{ secrets.SQLALCHEMY_DATABASE_URL }}
+      SQLALCHEMY_DATABASE_URL_ASYNC: ${{ secrets.SQLALCHEMY_DATABASE_URL_ASYNC }}
+      BE_URL: ${{ secrets.BE_URL }}
+      FE_URL: ${{ secrets.FE_URL }}
+      UPLOAD_DIR: ${{ secrets.UPLOAD_DIR }}
 
     steps:
       - name: Check out repository code
