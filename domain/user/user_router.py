@@ -7,7 +7,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 from starlette import status
 
-from database import get_db, get_async_db
+from database import get_async_db
 from domain.user import user_crud, user_schema
 from domain.user.user_crud import pwd_context
 from models import User

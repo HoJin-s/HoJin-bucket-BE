@@ -1,17 +1,17 @@
-from sqlalchemy import create_engine, MetaData
+from sqlalchemy import MetaData
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
-from sqlalchemy.orm import sessionmaker, declarative_base
-from settings import get_sqlalchemy_database_url, get_sqlalchemy_database_url_async
+from sqlalchemy.orm import declarative_base
+from settings import get_sqlalchemy_database_url_async
 
-# 동기
-SQLALCHEMY_DATABASE_URL = get_sqlalchemy_database_url()
-if SQLALCHEMY_DATABASE_URL.startswith("sqlite"):
-    engine = create_engine(
-        SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
-    )
-else:
-    engine = create_engine(SQLALCHEMY_DATABASE_URL)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+# # 동기
+# SQLALCHEMY_DATABASE_URL = get_sqlalchemy_database_url()
+# if SQLALCHEMY_DATABASE_URL.startswith("sqlite"):
+#     engine = create_engine(
+#         SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
+#     )
+# else:
+#     engine = create_engine(SQLALCHEMY_DATABASE_URL)
+# SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 # 비동기
 SQLALCHEMY_DATABASE_URL_ASYNC = get_sqlalchemy_database_url_async()
@@ -34,12 +34,12 @@ naming_convention = {
 Base = declarative_base(metadata=MetaData(naming_convention=naming_convention))
 
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+# def get_db():
+#     db = SessionLocal()
+#     try:
+#         yield db
+#     finally:
+#         db.close()
 
 
 async def get_async_db():
