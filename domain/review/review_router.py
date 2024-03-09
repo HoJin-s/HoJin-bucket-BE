@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-from database import get_db, get_async_db
+from database import get_async_db
 from domain.bucketlist import bucketlist_crud
 from domain.review import review_schema, review_crud
 from domain.user.user_router import get_current_user
