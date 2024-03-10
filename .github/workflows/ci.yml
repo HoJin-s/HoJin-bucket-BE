@@ -42,17 +42,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Check Environment Variables
-        run: |
-          echo "ACCESS_TOKEN_EXPIRE_MINUTES: ${{ secrets.ACCESS_TOKEN_EXPIRE_MINUTES }}"
-          echo "SECRET_KEY: ${{ secrets.SECRET_KEY }}"
-          echo "ALGORITHM: ${{ secrets.ALGORITHM }}"
-          echo "SQLALCHEMY_DATABASE_URL: ${{ secrets.SQLALCHEMY_DATABASE_URL }}"
-          echo "SQLALCHEMY_DATABASE_URL_ASYNC: ${{ secrets.SQLALCHEMY_DATABASE_URL_ASYNC }}"
-          echo "BE_URL: ${{ secrets.BE_URL }}"
-          echo "FE_URL: ${{ secrets.FE_URL }}"
-          echo "UPLOAD_DIR: ${{ secrets.UPLOAD_DIR }}"
-
       - name: Run Test
         run: |
           pytest -v
