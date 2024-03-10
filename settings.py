@@ -1,3 +1,4 @@
+from sqlalchemy import URL
 from dotenv import load_dotenv
 import os
 
@@ -33,4 +34,14 @@ def get_sqlalchemy_database_url():
 
 
 def get_sqlalchemy_database_url_async():
-    return os.getenv("SQLALCHEMY_DATABASE_URL_ASYNC")
+
+    SQLALCHEMY_DATABASE_URL_ASYNC = URL.create(
+        "postgresql+asyncpg",
+        username="postgres",
+        password=os.getenv("POSTGRES_PASSWORD"),
+        host="localhost",
+        port=5432,
+        database="hojin-bucket",
+    )
+
+    return SQLALCHEMY_DATABASE_URL_ASYNC
