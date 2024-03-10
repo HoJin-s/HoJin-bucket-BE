@@ -18,7 +18,8 @@ def get_upload_dir():
 
 
 def get_access_token_expire_minutes():
-    return int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))
+    ACCESS_TOKEN_EXPIRE_MINUTES = os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES")
+    return int(float(ACCESS_TOKEN_EXPIRE_MINUTES))
 
 
 def get_secret_key():
@@ -30,7 +31,17 @@ def get_algorithm():
 
 
 def get_sqlalchemy_database_url():
-    return os.getenv("SQLALCHEMY_DATABASE_URL")
+
+    SQLALCHEMY_DATABASE_URL = URL.create(
+        "postgresql",
+        username="postgres",
+        password=os.getenv("POSTGRES_PASSWORD"),
+        host="localhost",
+        port=5432,
+        database="hojin-bucket",
+    )
+
+    return SQLALCHEMY_DATABASE_URL
 
 
 def get_sqlalchemy_database_url_async():
