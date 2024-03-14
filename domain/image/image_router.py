@@ -132,7 +132,7 @@ async def delete_image(
     db: Session = Depends(get_async_db),
     current_user: User = Depends(get_current_user),
 ):
-    db_image = await db.get(Image, image_id)
+    db_image = await db.get(Image, int(image_id))
     if not db_image:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
