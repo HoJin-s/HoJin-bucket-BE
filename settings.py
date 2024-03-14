@@ -32,27 +32,9 @@ def get_algorithm():
 
 def get_sqlalchemy_database_url():
 
-    SQLALCHEMY_DATABASE_URL = URL.create(
-        "postgresql",
-        username="postgres",
-        password=os.getenv("POSTGRES_PASSWORD"),
-        host="localhost",
-        port=5432,
-        database="hojin-bucket",
-    )
-
-    return SQLALCHEMY_DATABASE_URL
+    return os.getenv("SQLALCHEMY_DATABASE_URL")
 
 
 def get_sqlalchemy_database_url_async():
 
-    SQLALCHEMY_DATABASE_URL_ASYNC = URL.create(
-        "postgresql+asyncpg",
-        username="postgres",
-        password=os.getenv("POSTGRES_PASSWORD"),
-        host="localhost",
-        port=5432,
-        database="hojin-bucket",
-    )
-
-    return SQLALCHEMY_DATABASE_URL_ASYNC
+    return os.getenv("SQLALCHEMY_DATABASE_URL_ASYNC")
