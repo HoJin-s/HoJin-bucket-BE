@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: HoJin-bucket-BE
+    runtime: python
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "./start.sh"
+    plan: free
