@@ -14,10 +14,9 @@ UPLOAD_DIR = get_upload_dir()
 
 app = FastAPI()
 
-origins = [
-    BE_URL,
-    FE_URL,
-]
+origins = [BE_URL]
+for fe in FE_URL:  # FE_URL가 리스트 형태라서 append로 넣어줌
+    origins.append(fe)
 
 app.add_middleware(
     CORSMiddleware,
