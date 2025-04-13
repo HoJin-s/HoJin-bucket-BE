@@ -15,11 +15,8 @@ UPLOAD_DIR = get_upload_dir()
 app = FastAPI()
 
 origins = [
+    BE_URL,
     FE_URL,
-    "http://13.125.115.33:8000/",
-    "localhost:8000",
-    "127.0.0.1:8000",
-    "https://www.hojinbucket.store",
 ]
 
 app.add_middleware(
