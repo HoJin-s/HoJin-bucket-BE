@@ -10,7 +10,7 @@ def get_be_url():
 
 
 def get_fe_url():
-    return os.getenv("FE_URL")
+    return os.getenv("FE_URL").split()
 
 
 def get_upload_dir():
